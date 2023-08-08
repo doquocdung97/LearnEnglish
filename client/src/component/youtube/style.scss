@@ -1,0 +1,54 @@
+
+.subtitles{
+	height: 360px;
+	overflow: auto;
+	.subtitle{
+		text-align: left;
+		border-bottom: 1px solid #eee;
+    padding: 10px;
+		display: flex;
+    align-items: center;
+		justify-content: space-between;
+		&.active{
+			background: #eee;
+		}
+		p{
+			margin: 0;
+			padding: 0;
+		}
+		.tools{
+			display: flex;
+		}
+	}
+}
+.youtube-container {
+	overflow: hidden;
+	position: relative;
+	// width: 100%;
+	/* Keep it the right aspect-ratio */
+	// aspect-ratio: 16/9;
+	/* No clicking/hover effects */
+	// pointer-events: none;
+	// width: 630px;
+	.tools{
+		display: flex;
+		// position: absolute;
+    // bottom: 0;
+		.btn{
+			&.active{
+				background: #eee;
+			}
+		}
+	}
+	.video{
+		max-height: 500px;
+	}
+	iframe {
+		/* Extend it beyond the viewport... */
+		// width: 300%;
+		// height: 430px;
+		// /* ...and bring it back again */
+		// margin-left: -100%;
+		// pointer-events: none;
+	}
+}

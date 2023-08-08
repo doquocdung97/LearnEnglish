@@ -1,0 +1,48 @@
+@import "../../../style/base/common.scss";
+
+.objective-test{
+	.question{
+		display: flex;
+		gap: 5px;
+		margin: 10px 0;
+		align-items: center;
+		flex-wrap: wrap;
+		.hide,.active,.error{
+			width: 100px;
+			border: 1px solid #0008ff;
+			border-radius: 5px;
+			text-align: center;
+			font-weight: bold;
+			padding: 5px;
+		}
+		.active{
+			border: 1px solid transparent;
+			min-width: 100px;
+			width: auto;
+			@include active_background;
+		}
+		.error{
+			border: 1px solid transparent;
+			min-width: 100px;
+			width: auto;
+			@include error_background;
+		}
+		p{
+			margin: 0;
+			@include t-title-01;
+			min-height: 20px;
+		}
+	}
+	.answer{
+		margin: 10px 0;
+		.badge{
+			cursor: pointer;
+		}
+	}
+	.btn-box{
+		width: 100%;
+		display: flex;
+		justify-content: flex-end;
+	}
+	
+}

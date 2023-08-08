@@ -1,0 +1,28 @@
+$color01:#0d6efd;
+$color02:#cc1720;
+$color_white:#fff;
+
+@mixin active_background {
+  background: $color01;
+  color: $color_white;
+}
+@mixin error_background {
+  background: $color02;
+  color: $color_white;
+}
+
+@mixin t-title-01 {
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 20px;
+}
+@mixin t-title-02 {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 18px;
+}
+@mixin t-title-03 {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 16px;
+}

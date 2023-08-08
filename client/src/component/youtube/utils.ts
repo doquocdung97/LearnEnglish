@@ -1,0 +1,178 @@
+import { getRandomNumber, getRandomNumbers, randomSort, separateWords } from "../../common/utils";
+
+
+export class Subtitle {
+	start: number = 0
+	dur: number = 0
+	text: string = String()
+	texts: string[] = []
+}
+export class Subtitles {
+	private data: Subtitle[] = []
+	private words: string[] = []
+	private indexcurrent: number = 0
+	constructor() {
+	}
+	static parse(objs: any): Subtitles | null {
+		try {
+			let model = new Subtitles()
+			if (objs instanceof Array) {
+				objs.map((item: any) => {
+					let data = new Subtitle();
+					data.start = item.start;
+					data.dur = item.dur;
+					data.text = item.text;
+					data.texts = separateWords(item.text)
+					model.words.push(...data.texts)
+					model.data.push(data)
+				})
+			}
+			return model
+		} catch (error) {
+
+		}
+		return null
+	}
+	get Words() {
+		return this.words
+	}
+	getSubtitleActive() {
+
+	}
+	getExercise(item: Subtitle,numberword:number = 0) {
+		let data = new Exercise(item, this, numberword)
+		return data
+	}
+}
+export class WordQuestion {
+	text: string = String()
+	reply: string | null = null
+	hide: boolean = false;
+	error: boolean = false;
+	check():boolean{
+		return (this.text === this.reply)
+	}
+}
+export class WordOption {
+	text: string = String()
+	hide: boolean = false;
+	constructor(text: string = String(), hide: boolean = false) {
+		this.text = text
+		this.hide = hide
+	}
+}
+export class Exercise {
+	private _subtitle: Subtitle
+	private _subtitles: Subtitles
+	private _numberword: number
+	private _question: WordQuestion[] = []
+	private _options: WordOption[] = []
+	private _answer: string[] = []
+	private _replycount: number = 0
+	private _optionsNumber: number = 5
+	constructor(subtitle: Subtitle, subtitles: Subtitles, numberword: number) {
+		this._subtitle = subtitle
+		this._subtitles = subtitles
+		this._numberword = numberword
+		this.init()
+	}
+	init() {
+		var separate = separateWords(this._subtitle.text)
+		var randoms: number[] = []
+		if (separate.length > 1) {
+			randoms = getRandomNumbers(0, separate.length - 1, this._numberword)
+		}
+		separate.map((text: string, index: number) => {
+			var hide = true
+			if(this._numberword != 0){
+				hide = randoms.find(x => x === index) != undefined
+			}
+			if (hide) {
+				this._answer.push(text)
+			}
+			const word = new WordQuestion()
+			word.text = text;
+			word.hide = hide
+			this._question.push(word)
+		})
+
+		//handle option
+		let words = this._subtitles.Words
+		let options: WordOption[] = []
+		this._answer.map(word => {
+			options.push(new WordOption(word))
+		})
+
+
+		if (options.length <= this._optionsNumber && words.length >= this._optionsNumber) {
+			// let length = this._optionsNumber - options.length
+			while (options.length < this._optionsNumber) {
+				let random = getRandomNumber(0, words.length - 1)
+				let word = words[random]
+				if (options.length <= 0 || options.find(x => x.text != word)) {
+					options.push(new WordOption(word))
+				}
+			}
+		}
+		this._options = randomSort(options)
+	}
+	addReply(data: WordOption) {
+		for (let index = 0; index < this._question.length; index++) {
+			const word = this._question[index];
+			if(word.hide && !word.reply){
+				word.reply = data.text
+				word.error = false
+				data.hide = true
+				this._replycount++;
+				return
+			}
+		}
+		// this._replys.push(text)
+	}
+	removeReply(word: WordQuestion) {
+		const option = this._options.find(x=>x.text == word.reply && x.hide)
+		if(option){
+			option.hide = false
+			word.reply = null
+			this._replycount--;
+		}
+	}
+	checkAnswer(): boolean {
+		let status = true
+		for (let index = 0; index < this._question.length; index++) {
+			const question = this._question[index];
+			if(question.hide && !question.check()){
+				question.error = true
+				status = false
+			}
+		}
+		return status;
+	}
+	suggest(){
+		for (let index = 0; index < this._question.length; index++) {
+			const word = this._question[index];
+			if(word.hide && !word.reply){
+				word.reply = word.text
+				word.error = false
+				this._replycount++;
+				let option = this._options.find(x=>x.text == word.text)
+				if(option){
+					option.hide = true
+				}
+				return
+			}
+		}
+	}
+	get isSend():boolean{
+		return this._replycount == this._answer.length
+	}
+	get Question() {
+		return this._question
+	}
+	get Answer(): string[] {
+		return this._answer
+	}
+	get Options(): WordOption[] {
+		return this._options
+	}
+}
