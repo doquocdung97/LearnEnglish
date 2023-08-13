@@ -1,4 +1,4 @@
-@import "../../../style/base/common.scss";
+@import "../../../style/base/common";
 
 .objective-test{
 	.question{
@@ -15,22 +15,37 @@
 			font-weight: bold;
 			padding: 5px;
 		}
-		.active{
-			border: 1px solid transparent;
-			min-width: 100px;
-			width: auto;
-			@include active_background;
-		}
-		.error{
-			border: 1px solid transparent;
-			min-width: 100px;
-			width: auto;
-			@include error_background;
+		
+		input{
+			width: 100px;
+			border: 1px solid #0008ff;
+			border-radius: 5px;
+			text-align: center;
+			font-weight: bold;
+			padding: 5px;
+			&.error{
+				border: 1px solid $color02;
+			}
+			&:focus-visible {
+				outline: none;
+			}
 		}
 		p{
 			margin: 0;
 			@include t-title-01;
 			min-height: 20px;
+			&.active{
+				border: 1px solid transparent;
+				min-width: 100px;
+				width: auto;
+				@include active_background;
+			}
+			&.error{
+				border: 1px solid transparent;
+				min-width: 100px;
+				width: auto;
+				@include error_background;
+			}
 		}
 	}
 	.answer{

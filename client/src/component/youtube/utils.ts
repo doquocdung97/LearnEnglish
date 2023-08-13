@@ -6,25 +6,30 @@ export class Subtitle {
 	dur: number = 0
 	text: string = String()
 	texts: string[] = []
+	exercise: Exercise | null = null
 }
 export class Subtitles {
-	private data: Subtitle[] = []
+	private _data: Subtitle[] = []
 	private words: string[] = []
-	private indexcurrent: number = 0
 	constructor() {
 	}
+	get data(): Subtitle[]{
+		return this._data
+	}	
 	static parse(objs: any): Subtitles | null {
 		try {
 			let model = new Subtitles()
 			if (objs instanceof Array) {
 				objs.map((item: any) => {
-					let data = new Subtitle();
-					data.start = item.start;
-					data.dur = item.dur;
-					data.text = item.text;
-					data.texts = separateWords(item.text)
-					model.words.push(...data.texts)
-					model.data.push(data)
+					if(!item.text?.includes("[Music]")){
+						let data = new Subtitle();
+						data.start = item.start;
+						data.dur = item.dur;
+						data.text = item.text;
+						data.texts = separateWords(item.text)
+						model.words.push(...data.texts)
+						model._data.push(data)
+					}
 				})
 			}
 			return model
@@ -39,7 +44,13 @@ export class Subtitles {
 	getSubtitleActive() {
 
 	}
-	getExercise(item: Subtitle,numberword:number = 0) {
+	generateExercise() {
+		this._data.map((item: Subtitle) => {
+			if (item.texts.length > 1)
+				item.exercise = new Exercise(item, this, 2);
+		})
+	}
+	getExercise(item: Subtitle, numberword: number = 0) {
 		let data = new Exercise(item, this, numberword)
 		return data
 	}
@@ -49,8 +60,8 @@ export class WordQuestion {
 	reply: string | null = null
 	hide: boolean = false;
 	error: boolean = false;
-	check():boolean{
-		return (this.text === this.reply)
+	check(): boolean {
+		return (this.text.trim().toLowerCase() === this.reply?.trim().toLowerCase())
 	}
 }
 export class WordOption {
@@ -84,7 +95,7 @@ export class Exercise {
 		}
 		separate.map((text: string, index: number) => {
 			var hide = true
-			if(this._numberword != 0){
+			if (this._numberword != 0) {
 				hide = randoms.find(x => x === index) != undefined
 			}
 			if (hide) {
@@ -119,7 +130,7 @@ export class Exercise {
 	addReply(data: WordOption) {
 		for (let index = 0; index < this._question.length; index++) {
 			const word = this._question[index];
-			if(word.hide && !word.reply){
+			if (word.hide && !word.reply) {
 				word.reply = data.text
 				word.error = false
 				data.hide = true
@@ -130,8 +141,8 @@ export class Exercise {
 		// this._replys.push(text)
 	}
 	removeReply(word: WordQuestion) {
-		const option = this._options.find(x=>x.text == word.reply && x.hide)
-		if(option){
+		const option = this._options.find(x => x.text == word.reply && x.hide)
+		if (option) {
 			option.hide = false
 			word.reply = null
 			this._replycount--;
@@ -141,29 +152,29 @@ export class Exercise {
 		let status = true
 		for (let index = 0; index < this._question.length; index++) {
 			const question = this._question[index];
-			if(question.hide && !question.check()){
+			if (question.hide && !question.check()) {
 				question.error = true
 				status = false
 			}
 		}
 		return status;
 	}
-	suggest(){
+	suggest() {
 		for (let index = 0; index < this._question.length; index++) {
 			const word = this._question[index];
-			if(word.hide && !word.reply){
+			if (word.hide && !word.reply) {
 				word.reply = word.text
 				word.error = false
 				this._replycount++;
-				let option = this._options.find(x=>x.text == word.text)
-				if(option){
+				let option = this._options.find(x => x.text == word.text)
+				if (option) {
 					option.hide = true
 				}
 				return
 			}
 		}
 	}
-	get isSend():boolean{
+	get isSend(): boolean {
 		return this._replycount == this._answer.length
 	}
 	get Question() {

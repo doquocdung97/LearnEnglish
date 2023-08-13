@@ -1,4 +1,4 @@
-
+@import "../../style/base/common";
 .subtitles{
 	height: 360px;
 	overflow: auto;
@@ -12,12 +12,40 @@
 		&.active{
 			background: #eee;
 		}
-		p{
-			margin: 0;
-			padding: 0;
-		}
+		
 		.tools{
 			display: flex;
+		}
+		.txt{
+			display: flex;
+			gap: 5px;
+			flex-wrap: wrap;
+			.hide,.active,.error{
+				width: 100px;
+				border: 1px solid #0008ff;
+				border-radius: 5px;
+				text-align: center;
+				font-weight: bold;
+				padding: 5px;
+			}
+			p{
+				margin: 0;
+				padding: 0;
+				@include t-title-02;
+			}
+		}
+	
+	}
+}
+.subtitle-active{
+	.txt-subtitle{
+		display: flex;
+    gap: 5px;
+		span{
+			cursor: pointer;
+			&:hover{
+				text-decoration:underline;
+			}
 		}
 	}
 }
@@ -51,4 +79,9 @@
 		// margin-left: -100%;
 		// pointer-events: none;
 	}
+}
+.meaning{
+	border:1px solid #eee;
+	margin: 10px;
+	padding: 10px;
 }
