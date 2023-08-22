@@ -1,0 +1,18 @@
+.btn-icon-sm{
+    border: none;
+    background: transparent;
+    display: flex;
+    // padding: 5px;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    justify-items: center;
+    align-items: center;
+    &:active {
+        background: #eee;
+        // border-color: #eee;
+    }
+    &.loading{
+        
+    }
+}

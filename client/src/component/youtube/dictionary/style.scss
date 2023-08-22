@@ -1,0 +1,50 @@
+@import "../../../style/base/common";
+@import "../../../style/component/button";
+
+.dictionarys {
+    .tools {}
+
+    .list {
+        height: 360px;
+        overflow: auto;
+
+        .dictionary {
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+
+            &.active {
+                background: #eee;
+            }
+
+            .txt {
+                // display: flex;
+                // gap: 5px;
+                // flex-wrap: wrap;
+                display: flex;
+                flex-direction: column;
+                row-gap: 5px;
+                .txt-title {
+                    margin: 0;
+                    padding: 0;
+                    @include t-title-02;
+                }
+                .txt-sub {
+                    margin: 0;
+                    padding: 0;
+                    @include t-title-04;
+                }
+            }
+            
+            .tools {
+                display: flex;
+                gap: 5px;
+            }
+        }
+    }
+
+}

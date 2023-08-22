@@ -1,0 +1,70 @@
+import { createLogger, transports, format, Logger } from 'winston';
+import { join } from 'path';
+import { Variables } from "../constants";
+import { TransformableInfo } from 'logform';
+// import { DirRoot } from './utils';
+
+function filenamebydate(filename: String) {
+  let date = new Date();
+  let newFilename = `${date.getFullYear()}-${
+    date.getMonth() + 1
+  }-${date.getDate()}_${filename}`;
+  return newFilename;
+}
+export class LoggerHelper {
+  private logger:Logger;
+  constructor(name: string) {
+    let self = this;
+    let data_transports: any = [
+      new transports.Console({
+        format: format.combine(
+          format.colorize(),
+          format.printf((log) => self.printf(log)),
+        ),
+      }),
+    ];
+    if (true) {
+      let path = Variables.FOLDER_LOGGER
+      data_transports.push(
+        new transports.File({
+          level: Variables.LEVEL_ERROR,
+          filename: join(path,filenamebydate(Variables.ERROR_FILE)),
+        }),
+        new transports.File({
+          level: Variables.LEVEL_INFO,
+          filename: join(path,filenamebydate(Variables.INFO_FILE)),
+        }),
+      );
+    }
+    this.logger = createLogger({
+      format: format.combine(
+        format.splat(),
+        format.timestamp({
+          format: Variables.FORMAT_DATE,
+        }),
+        format.printf((log) => self.printf(log)),
+      ),
+      defaultMeta: { name },
+      transports: data_transports,
+    });
+  }
+  private printf(info: TransformableInfo) {
+    let message = info.message;
+    message =  `[${info.timestamp}] [${info.level}] [${info.name}] - ${message} ${
+      info.stack || String()
+    }`;
+    return message
+  }
+  info(message: string) {
+    this.logger.info(message);
+  }
+  warn(message: string) {
+    this.logger.warn(message);
+  }
+  error(message: any, ...optionalParams: any[]) {
+    this.logger.error(`${message}\n ${optionalParams}`);
+  }
+  log(message: any, ...optionalParams: any[]) {
+    this.logger.info(message);
+  }
+}
