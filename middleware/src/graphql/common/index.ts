@@ -57,18 +57,34 @@ export function createResultPagination(name: string, model: GraphQLObjectType): 
 	return new GraphQLObjectType({
 		name: `Pagination${name}Result`,
 		fields: {
-			total: {
-				type: GraphQLInt
+			pagination: {
+				type: PaginationSchema
 			},
-			// page: {
-			// 	type: GraphQLInt
-			// },
-			// show: {
-			// 	type: GraphQLInt
-			// },
 			data: {
 				type: new GraphQLList(model)
 			}
 		}
 	})
 }
+export const PaginationSchema = new GraphQLObjectType({
+	name: `Pagination`,
+	fields: {
+		total: {
+			type: GraphQLInt
+		},
+		pageCount: {
+			type: GraphQLInt
+		},
+	}
+})
+export const PaginationInputSchema = new GraphQLInputObjectType({
+	name: `PaginationInput`,
+	fields: {
+		page: {
+			type: GraphQLInt
+		},
+		pageSize: {
+			type: GraphQLInt
+		}
+	}
+})

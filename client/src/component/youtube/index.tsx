@@ -1,15 +1,20 @@
 import React, { useRef, useState } from 'react';
 import './style.scss';
 // const { getSubtitles } = require('youtube-captions-scraper');
-import { Container, Row, Col, Dropdown, Modal, Button } from 'react-bootstrap';
+import { Container, Row, Col, Dropdown, Modal, Button, Tab, Tabs } from 'react-bootstrap';
+// import Tab from 'react-bootstrap/Tab';
+// import Tabs from 'react-bootstrap/Tabs';
 import YouTubeIframe from 'react-youtube';
 import axios from 'axios';
 import { Icon } from '../icon';
 import { Variables } from '../../constants';
 import Test from './Test';
-import { Subtitle, Subtitles, WordQuestion } from './utils';
+import { DictionaryModel, Subtitle, Subtitles as SubtitlesModel, WordQuestion } from './utils';
 import GraphqlHelper from '../../graphql';
-import { SEARCH_DICTIONARY } from '../../graphql/dictionary';
+import { DICTIONARYVIDEOS, CREATE_DICTIONARYVIDEO, SEARCH_DICTIONARY } from '../../graphql/dictionary';
+import { Dictionary } from './dictionary';
+import { Subtitles } from './Subtitle';
+import { VIDEO_DETAIL } from '../../graphql/video';
 // import captions from '../../data/captions.json';
 // getSubtitles({
 //   videoID: '8jPQjjsBbIc', // youtube video id
@@ -68,7 +73,7 @@ function VideoPlayerTools(props: any) {
 	)
 }
 function WordModal(props: any) {
-	const { show, handleClose, word } = props
+	const { show, handleClose, word, onHandleSave } = props
 	const [rowdata, setRowdata] = useState<{
 		translate: "",
 		phonetics: [{
@@ -90,7 +95,7 @@ function WordModal(props: any) {
 	const onHandleShow = () => {
 		setRowdata(null)
 		graphql.query(SEARCH_DICTIONARY, { word }).then((data: any) => {
-			if (data.searchDictionary.total > 0) {
+			if (data.searchDictionary.data.length > 0) {
 				setRowdata(data.searchDictionary.data[0])
 			}
 
@@ -99,6 +104,7 @@ function WordModal(props: any) {
 
 		})
 	}
+
 	return (
 		<Modal show={show} onHide={handleClose} onShow={onHandleShow} size="lg">
 			<Modal.Header closeButton>
@@ -165,7 +171,7 @@ function WordModal(props: any) {
 				<Button variant="secondary" onClick={handleClose}>
 					Close
 				</Button>
-				<Button variant="primary" onClick={handleClose}>
+				<Button variant="primary" onClick={onHandleSave}>
 					Save Changes
 				</Button>
 			</Modal.Footer>
@@ -174,14 +180,16 @@ function WordModal(props: any) {
 	);
 }
 function SubTitleActive(props: any) {
-	const { data, setPause, setPlay, playVideo } = props
+	const { data, setPause, setPlay, playVideo, videoId, dictionaryRef } = props
 	const [show, setShow] = useState(false);
 	const [word, setWord] = useState(String());
 	const [beforePlayVideo, setBeforePlayVideo] = useState(false);
 	const handleShow = (text: string) => {
 		setBeforePlayVideo(playVideo)
 		setShow(true)
-		setWord(text)
+		let wordrepeat = text
+		wordrepeat = wordrepeat.replace(/[!.,?]/g, String())
+		setWord(wordrepeat)
 		setPause()
 	};
 	const handleClose = () => {
@@ -189,6 +197,27 @@ function SubTitleActive(props: any) {
 		if (beforePlayVideo)
 			setPlay()
 	};
+	const onHandleSave = () => {
+		graphql.query(CREATE_DICTIONARYVIDEO, {
+			"videoId": videoId,
+			"word": word,
+			"start": parseFloat(data.start),
+			"dur": parseFloat(data.dur)
+		}).then((data: any) => {
+			let result = data?.createDictionaryByVideo
+			if (result && result.success) {
+				handleClose()
+				var dictionary = new DictionaryModel()
+				dictionary.id = result.data.id
+				dictionary.level = result.data.level
+				dictionary.word = result.data.word
+				dictionary.start = result.data.start
+				dictionary.dur = result.data.dur
+				dictionaryRef.current?.create(dictionary)
+			}
+
+		})
+	}
 	return (
 		<>
 			<div className="subtitle-active hidden-xs">
@@ -198,74 +227,14 @@ function SubTitleActive(props: any) {
 					})
 				}</h4>
 			</div>
-			<WordModal show={show} word={word} handleClose={handleClose}></WordModal>
+			<WordModal show={show} word={word} handleClose={handleClose} onHandleSave={onHandleSave}></WordModal>
 		</>
 	)
 }
-function SubTitleItem(props: any) {
-	const { data, onActive, parentRef, active, index, test } = props
-	const elementRef = useRef(null);
-	const current: any = elementRef.current
-	// var itemScrollPosition = 0
-	// if (current) {
-	// 	const scrollPosition = parentRef.current.scrollTop;
-	// 	const itemRect = current.getBoundingClientRect();
-	// 	itemScrollPosition = itemRect.top + scrollPosition;
-	// 	console.log(`List Item top: ${itemRect.top}, Scroll Position: ${itemScrollPosition}`);
-
-	// }
-	const getscrollTop = () => {
-		var itemScrollPosition = 0
-		if (current) {
-			const scrollPosition = parentRef.current.scrollTop;
-			const itemRect = current.getBoundingClientRect();
-			const parentRect = parentRef.current.getBoundingClientRect()
-
-			itemScrollPosition = (itemRect.top - parentRect.top) + scrollPosition;
-
-		}
-		return itemScrollPosition
-	}
-	if (active) {
-		let top = getscrollTop()
-		// console.log(`Row Top: ${top}`)
-		parentRef.current.scrollTo(0, (top - parentRef.current.clientHeight / 2))
-	}
-	let text = (<p>{data.text}</p>);
-	if (test && data.exercise) {
-		text = (
-			data.exercise.Question?.map((item: WordQuestion, i: number) => {
-				if (item.hide) {
-					// return <div key={i} className={item.error ? "error" : "active"}><p></p></div>
-					if (item.reply) {
-						return <div key={i} className={item.error ? "error" : "active"}><p>{item.reply}</p></div>
-					}
-					return <p className='' key={i}>.......</p>
-				} else {
-					return <p key={i}>{item.text}</p>
-				}
-			})
-		)
-	}
-	return (
-		<div ref={elementRef} className={`subtitle ${active ? 'active' : String()}`} onClick={() => onActive(index)}>
-			<div className='txt'>
-				{text}
-				{/* <p>{getscrollTop()}</p> */}
-				{/* <p>{data.repeat ? 'repeat':'NO'}</p> */}
-				{/* <p>{itemScrollPosition}</p> */}
-			</div>
-			<div className='tools'>
-				<button className='btn'><Icon iconName='Stopwatch'></Icon></button>
-				<button className='btn'><Icon iconName='ArrowRepeat'></Icon></button>
-			</div>
-
-		</div>
-	)
-}
 interface VideoPlayerProps {
-	videoId: string
-	test: boolean
+	videoId: string | undefined
+	test?: boolean
+	onReady?: (event: SubtitlesModel) => void;
 }
 interface VideoPlayerState {
 	repeat: boolean
@@ -273,17 +242,20 @@ interface VideoPlayerState {
 	input: string
 	playbackSpeed: number
 	option: any
-	model: Subtitles | null
+	model: SubtitlesModel | null
 	indexsub: number
 }
+
 class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 	_onEvent: any = null;
 	playerRef: any
 	subtitleRef: any
+	dictionaryRef: any
 	constructor(props: any) {
 		super(props)
 		this.playerRef = React.createRef();
 		this.subtitleRef = React.createRef();
+		this.dictionaryRef = React.createRef();
 		this.state = {
 			playVideo: false,
 			playbackSpeed: 1,
@@ -308,25 +280,33 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 	}
 	componentDidMount() {
 		// this.updateVideo("c0S6_6me9r8")
+		this.fetch()
+		window.addEventListener('resize', this.handleResize.bind(this))
+		this.handleResize()
+	}
+	async fetch() {
 		const videoId = this.props.videoId
 		const self = this
-		axios.get(`http://localhost:3001/subtitle/en/${videoId}`)
-			.then(function (response) {
-				// self.setState({ rowData: response.data })
-				const model = Subtitles.parse(response.data)
-				if (self.props.test && model) {
+		graphql.query(VIDEO_DETAIL, { videoId: videoId }).then(async (data: any) => {
+			const result = data?.video
+			if (result) {
+				const model = SubtitlesModel.parse(result.subtitles)
+				// if (self.props.test && model) {
+				// 	model.generateExercise()
+				// }
+
+				if (self.props.onReady && model) {
+					await self.props.onReady(model)
+				} else if (self.props.test && model) {
 					model.generateExercise()
 				}
 				self.setState({ model: model })
-				// console.log(response)
-				// self.setState({ videoId: videoId })
-			})
-			.catch(function (error) {
-				// handle error
-				console.log(error);
-			})
-		window.addEventListener('resize', this.handleResize.bind(this))
-		this.handleResize()
+			}
+
+		}).catch(function (error) {
+			// handle error
+			console.log(error);
+		})
 	}
 	handleResize() {
 		const container = document.querySelector(".youtube-container .video")
@@ -387,7 +367,6 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 			titleElement.style.display = 'none';
 		}
 		this.handleStateChange(event)
-		console.log("ready...")
 	}
 	handleStateChange(event: any) {
 		if (this._onEvent) {
@@ -441,18 +420,6 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 			// this.setActiveSub(data);
 		}
 	};
-	// setActiveSub(data: RowData) {
-	// 	let list: RowData[] = []
-	// 	for (let index = 0; index < this.state.rowData.length; index++) {
-	// 		const item: RowData = this.state.rowData[index];
-	// 		item.active = false;
-	// 		list.push(item)
-	// 	}
-	// 	let index = this.state.rowData.indexOf(data)
-	// 	list[index].active = true
-	// 	this.setState({ rowData: list })
-	// 	this.setState({ subCurrent: data })
-	// };
 	onActive(index: number) {
 		let data = this.state.model?.data[index]
 		if (data) {
@@ -486,21 +453,25 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 								<VideoPlayerTools parent={this} />
 							</div>
 							{
-								!this.props.test && (<SubTitleActive data={subCurrent} setPause={this.pause.bind(this)} setPlay={this.play.bind(this)} playVideo={this.state.playVideo} />)
+								!this.props.test && (<SubTitleActive dictionaryRef={this.dictionaryRef} data={subCurrent} setPause={this.pause.bind(this)} setPlay={this.play.bind(this)} playVideo={this.state.playVideo} videoId={this.props.videoId} />)
 							}
 
 						</Col>
 						<Col md={5}>
-							<div className='subtitles' ref={this.subtitleRef}>
-								{
-									this.state?.model?.data.map((item: Subtitle, index: number) => {
-										return <SubTitleItem data={item} key={index} index={index} active={this.state.indexsub == index} test={this.props.test} onActive={this.onActive.bind(this)} parentRef={this.subtitleRef} />
-									})
-								}
-							</div>
+							<Tabs
+								defaultActiveKey="dictionary"
+							>
+								<Tab eventKey="subtitle" title="Subtitle">
+									<Subtitles data={this.state.model?.data} indexsub={this.state.indexsub} test={this.props.test} onActive={this.onActive.bind(this)}></Subtitles>
+								</Tab>
+								<Tab eventKey="dictionary" title="Dictionary">
+									<Dictionary ref={this.dictionaryRef} videoId={this.props.videoId} model={this.state.model}></Dictionary>
+								</Tab>
+							</Tabs>
+
 						</Col>
 						{
-							this.props.test && (<Test level={3} data={subCurrent} subtitles={this.state.model} next={this.nextSub.bind(this)} />)
+							this.props.test && (<Test level={1} data={subCurrent} subtitles={this.state.model} next={this.nextSub.bind(this)} />)
 						}
 
 					</Row>
@@ -510,13 +481,8 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 	}
 }
 
-function Youtube(props: any) {
-	console.log('test')
-	return (
-		<>
-			<VideoPlayer {...props}></VideoPlayer>
-		</>
-	);
-}
+// function Youtube(props: any) {
+// 	return (<VideoPlayer {...props}></VideoPlayer>);
+// }
 
-export default Youtube;
+export default VideoPlayer;

@@ -19,7 +19,7 @@ export default class DictionaryAPIHelper {
 		return httpClient.get(url)
 			.then(function (response) {
 				// handle success
-				console.log(url,response.headers['request-duration'])
+				// console.log(url,response.headers['request-duration'])
 				return response.data
 			})
 			.catch(function (error) {

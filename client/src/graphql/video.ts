@@ -3,7 +3,6 @@ import {  gql } from '@apollo/client';
 export const GET_MY_VIDEOS = gql`
 query MyVideos {
   myVideos {
-    total
     data {
       id
       title
@@ -16,4 +15,17 @@ query MyVideos {
     }
   }
 }
+`;
+
+export const VIDEO_DETAIL = gql`
+query video($videoId: String!) {
+  video(id: $videoId) {
+    subtitles {
+      dur
+      start
+      text
+    }
+  }
+}
+
 `;

@@ -8,10 +8,10 @@ function Header(props:any) {
 						<Link to="/"> Home</Link>
 					</li>
 					<li>
-						<Link to="/video"> video</Link>
+						<Link to="/myvideo">My Video</Link>
 					</li>
 					<li>
-						<Link to="/"> Log In</Link>
+						<Link to="/mydictionary">My Dictionary</Link>
 					</li>
 					<li>
 						<Link to="signup"> Sign Up</Link>

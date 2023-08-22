@@ -39,7 +39,6 @@ app.get('/subtitle/:lang/:id', async function (req, res) {
 	}
 });
 app.get('/translate/:text.mp3', async function (req, res) {
-	// response.write(request.body.user);
 	try {
 		const text = req.params.text;
 		const gtts = new gTTS(text, "en");

@@ -13,12 +13,13 @@ function Watching(props: any) {
 function Level1(props: any) {
 	const { data, next } = props
 	const Subtitles: Subtitles = props?.subtitles
-	const [exercise, setExercise] = useState<Exercise | null>(null)
+	// const [exercise, setExercise] = useState<Exercise | null>(null)
 	const [autoSubmit, setAutoSubmit] = useState(true)
 	const [update, setUpdate] = useState(new Date())
-	useEffect(() => {
-		setExercise(Subtitles?.getExercise(data, 2))
-	}, [data]);
+	// useEffect(() => {
+	// 	setExercise(Subtitles?.getExercise(data, 2))
+	// }, [data]);
+	const exercise:Exercise = data?.exercise
 	const onSelect = (option: WordOption) => {
 		exercise?.addReply(option)
 		setUpdate(new Date())
@@ -51,7 +52,7 @@ function Level1(props: any) {
 				<div className="objective-test">
 					<div className="question">
 						{
-							exercise?.Question.map((item: WordQuestion, index) => {
+							exercise?.Question.map((item: WordQuestion, index:number) => {
 								if (item.hide) {
 									if (item.reply) {
 										return <button key={index} className={item.error ? "error" : "active"} onClick={() => onRemoveSelect(item)}><p>{item.reply}</p></button>
@@ -66,7 +67,7 @@ function Level1(props: any) {
 					</div>
 					<Stack className="answer" direction="horizontal" gap={2}>
 						{
-							exercise?.Options.map((option, index) => {
+							exercise?.Options.map((option:any, index:number) => {
 								return !option.hide && <Button disabled={issend} key={index} onClick={() => onSelect(option)}>{option.text}</Button>
 							})
 						}
@@ -96,9 +97,10 @@ function Level1(props: any) {
 function Level2(props: any) {
 	const { data, next } = props
 	const Subtitles: Subtitles = props?.subtitles
-	const [exercise, setExercise] = useState<Exercise>(data.exercise)
+	// const [exercise, setExercise] = useState<Exercise | null>(null)
 	const [autoSubmit, setAutoSubmit] = useState(true)
 	const [update, setUpdate] = useState(new Date())
+	const exercise:Exercise = data?.exercise
 	// useEffect(() => {
 	// 	setExercise(Subtitles?.getExercise(data))
 	// }, [data]);
@@ -134,7 +136,7 @@ function Level2(props: any) {
 				<div className="objective-test">
 					<div className="question">
 						{
-							exercise?.Question.map((item: WordQuestion, index) => {
+							exercise?.Question.map((item: WordQuestion, index:number) => {
 								if (item.hide) {
 									if (item.reply) {
 										return <button key={index} className={item.error ? "error" : "active"} onClick={() => onRemoveSelect(item)}><p>{item.reply}</p></button>
@@ -149,7 +151,7 @@ function Level2(props: any) {
 					</div>
 					<Stack className="answer" direction="horizontal" gap={2}>
 						{
-							exercise?.Options.map((option, index) => {
+							exercise?.Options.map((option, index:number) => {
 								return !option.hide && <Button disabled={issend} key={index} onClick={() => onSelect(option)}>{option.text}</Button>
 							})
 						}

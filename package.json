@@ -8,7 +8,7 @@
     "start": "npm-run-all --parallel start:**",
     "start:middleware": "cd middleware && npm run watch",
     "start:client": "cd client && npm start",
-    "core:core": "f: && cd F:\\server_backup\\cms && npm run develop"
+    "core": "i: && cd i:\\server_backup\\cms && npm run develop"
   },
   "author": "",
   "license": "ISC",

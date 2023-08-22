@@ -14,7 +14,9 @@ import {
 	GraphQLResolveInfo
 } from 'graphql';
 import TranslateRepository from '../../repository/Translate';
+import DictionaryRepository from '../../repository/Dictionary';
 const translaterepo = new TranslateRepository()
+const dictionaryrepo = new DictionaryRepository()
 export const PhoneticSchema = new GraphQLObjectType({
 	name: 'Phonetic',
 	fields: {
@@ -68,5 +70,35 @@ export const DictionarySchema = new GraphQLObjectType({
 		meanings: {
 			type: new GraphQLList(MeaningSchema),
 		},
+	},
+});
+export const MyDictionarySchema = new GraphQLObjectType({
+	name: 'MyDictionary',
+	fields: {
+		id: {
+			type: GraphQLInt,
+		},
+		level: {
+			type: GraphQLInt,
+		},
+		word: {
+			type: GraphQLString,
+		},
+		start: {
+			type: GraphQLFloat,
+		},
+		dur: {
+			type: GraphQLFloat,
+		},
+		detail: {
+			type: DictionarySchema,
+			resolve: async (source: any, args: any, context: any, info: any) => {
+				if (source.word) {
+					const dictionarys = await dictionaryrepo.getWord(source.word)
+					return dictionarys.length > 0 ? dictionarys[0] : null
+				}
+				return
+			}
+		}
 	},
 });

@@ -10,14 +10,14 @@ export default class YoutubeAPIHelper {
 	_setting: any
 	_client: GraphQLClient
 	constructor() {
-		this._logger = new LoggerHelper('CMS')
+		this._logger = new LoggerHelper(this.constructor.name)
 		this._setting = {
 			"ENDPOINT": `${Config.GOOGLE_API_ENDPOINT}/youtube/v3`,
 			"KEY": Config.YOUTUBE_KEY
 		}
 
 		this._client = new GraphQLClient(this._setting.ENDPOINT);
-		this._logger.info(`start CMSHelper hrl: ${this._setting.ENDPOINT}`)
+		this._logger.info(`start CMSHelper url: ${this._setting.ENDPOINT}`)
 	}
 	async fetch_data(url: string, params: any = {}) {
 		url = `${this._setting.ENDPOINT}${url}`

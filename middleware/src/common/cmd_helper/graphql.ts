@@ -91,6 +91,101 @@ mutation deleteVideo($id:ID!){
   }
 }
   `
+  //query dictionary
+
+  static readonly CREATE_DICTIONARYVIDEO = gql`
+  mutation ($input:DictionaryVideoInput!){
+    createDictionaryVideo(data:$input){
+      data{
+        id
+        attributes{
+          word
+          level
+          start
+          dur
+        }
+      }
+    }
+  }
+  `
+
+  /**
+   *{
+   *  "id": ID!,
+   *  "level": Int!
+   *}
+   */
+  static readonly UPDATE_LEVEL_DICTIONARYVIDEO = gql`
+  mutation updateDictionaryVideo($id:ID!,$level:Int){
+    updateDictionaryVideo(id:$id,data:{level:$level}){
+      data{
+         id
+        attributes{
+          word
+          level
+          start
+          dur
+        }
+      }
+    }
+  }
+  `
+  static readonly CHECK_BEFORE_DELETE_DICTIONARYVIDEO = gql`
+  query($userId:ID!,$id:ID!){
+    dictionaryVideos(filters:{user:{id:{eq:$userId}},id:{eq:$id}}){
+      data{
+        id
+      }
+    }
+  }
+  `
+  static readonly DELETE_DICTIONARYVIDEO = gql`
+  mutation deleteDictionaryVideo($id:ID!){
+    deleteDictionaryVideo(id:$id){
+      data{
+        id
+      }
+    }
+  }
+  `
+  static readonly DICTIONARYVIDEOS = gql`
+  query DictionaryVideos($VideoId:String,$userId:ID!,$sort: [String], $pagination: PaginationArg) {
+    dictionaryVideos(sort: $sort, pagination: $pagination,filters:{user:{id:{eq:$userId}}, video:{VideoId:{eq:$VideoId}}}) {
+      meta {
+        pagination {
+          page
+          pageCount
+          pageSize
+          total
+        }
+      }
+      data {
+        id
+        attributes {
+          word
+          level
+          dur
+          start
+        }
+      }
+    }
+  }
+  `
+  static readonly DICTIONARYVIDEO = gql`
+  query($VideoId:String,$word:String,$userId:ID!){
+    dictionaryVideos(filters:{user:{id:{eq:$userId}},video:{VideoId:{eq:$VideoId}},word:{eq:$word}}){
+      data{
+        id
+        attributes{
+          word
+          level
+          start
+          dur
+        }
+      }
+    }
+  }
+  `
 }
 export class GRAPHQL_VIDEO {
   static readonly LOGIN = gql`

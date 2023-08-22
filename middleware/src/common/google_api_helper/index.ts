@@ -8,7 +8,7 @@ export default class GoogleAPIHelper {
 	_logger: LoggerHelper
 	_setting: any
 	constructor() {
-		this._logger = new LoggerHelper('CMS')
+		this._logger = new LoggerHelper(this.constructor.name)
 		this._setting = {
 			"YOUR_CLIENT_ID": "",
 			"YOUR_CLIENT_SECRET": "",

@@ -16,7 +16,7 @@ export class CMSHelper {
 		}
 
 		this._client = new GraphQLClient(this._setting.ENDPOINT);
-		this._logger.info(`start CMSHelper hrl: ${this._setting.ENDPOINT}`)
+		this._logger.info(`start CMSHelper url: ${this._setting.ENDPOINT}`)
 	}
 	async query(query: any, variables: any = {}) {
 		try {
@@ -35,6 +35,7 @@ export class CMSHelper {
 				return user
 			}
 		} catch (error) {
+			console.log(error)
 			this._logger.error(`error ${error}\n query: Me`)
 		}
 	}

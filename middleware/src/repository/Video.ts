@@ -95,6 +95,40 @@ export default class VideoRepository {
 		}
 		return false
 	}
+	async getAndreateMyVideo(userId: number, videoId: string): Promise<number | null> {
+		try {
+			const variables = {
+				"videoId": videoId,
+				"userId": userId
+			}
+			try {
+				const query: any = await this._cmsHelper.query(GRAPHQL_USER.VIDEO, variables)
+				
+				if (query && query.videos?.data && query.videos?.data.length == 1) {
+					return query.videos?.data[0].id
+				}
+				
+				const querycreate: any = await this._cmsHelper.query(GRAPHQL_USER.CREATE_VIDEO, {
+					"videoid": videoId,
+					"publishedAt": new Date(),
+					"userid": userId
+				})
+				if (querycreate) {
+					return querycreate.createVideo?.data.id
+				}
+			} catch (error) {
+				let msg = `error getAndreateMyVideo: ${error}\nuserId: ${userId} videoId: ${videoId}`
+				this._logger.error(msg)
+				throw new Error(msg)
+			}
+
+		} catch (error) {
+			let msg = `error createMyVideo: ${error}\nuserId: ${userId} videoId: ${videoId}`
+			this._logger.error(msg)
+			throw new Error(msg)
+		}
+		return null
+	}
 	async deleteMyVideo(userId: number, videoId: string): Promise<boolean> {
 		const variables = {
 			"videoId": videoId,

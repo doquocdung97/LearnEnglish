@@ -27,6 +27,13 @@ const SubtitleSchema = new GraphQLObjectType({
 		},
 		text: {
 			type: GraphQLString,
+			resolve: async (source: any, args: any, context: any, info: any) => {
+				// source.text.replace(/<style([\s\S]*?)<\/style>/gi, ' ')
+				// .replace(/<script([\s\S]*?)<\/script>/gi, ' ')
+				// .replace(/(<(?:.|\n)*?>)/gm, ' ')
+				// .replace(/\s+/gm, '-');
+				return source.text.replace(/\s+/gm, ' ')
+			}
 		}
 	},
 });

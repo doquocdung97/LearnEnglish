@@ -1,76 +1,46 @@
 @import "../../style/base/common";
-.subtitles{
-	height: 360px;
-	overflow: auto;
-	.subtitle{
-		text-align: left;
-		border-bottom: 1px solid #eee;
-    padding: 10px;
+
+.subtitle-active {
+	.txt-subtitle {
 		display: flex;
-    align-items: center;
-		justify-content: space-between;
-		&.active{
-			background: #eee;
-		}
-		
-		.tools{
-			display: flex;
-		}
-		.txt{
-			display: flex;
-			gap: 5px;
-			flex-wrap: wrap;
-			.hide,.active,.error{
-				width: 100px;
-				border: 1px solid #0008ff;
-				border-radius: 5px;
-				text-align: center;
-				font-weight: bold;
-				padding: 5px;
-			}
-			p{
-				margin: 0;
-				padding: 0;
-				@include t-title-02;
-			}
-		}
-	
-	}
-}
-.subtitle-active{
-	.txt-subtitle{
-		display: flex;
-    gap: 5px;
-		span{
+		gap: 5px;
+		flex-wrap: wrap;
+		span {
 			cursor: pointer;
-			&:hover{
-				text-decoration:underline;
+
+			&:hover {
+				text-decoration: underline;
 			}
 		}
 	}
 }
+
 .youtube-container {
 	overflow: hidden;
 	position: relative;
+
 	// width: 100%;
 	/* Keep it the right aspect-ratio */
 	// aspect-ratio: 16/9;
 	/* No clicking/hover effects */
 	// pointer-events: none;
 	// width: 630px;
-	.tools{
+	.tools {
 		display: flex;
+
 		// position: absolute;
-    // bottom: 0;
-		.btn{
-			&.active{
+		// bottom: 0;
+		.btn {
+			&.active {
 				background: #eee;
 			}
 		}
 	}
-	.video{
+
+	.video {
 		max-height: 500px;
 	}
+
 	iframe {
 		/* Extend it beyond the viewport... */
 		// width: 300%;
@@ -80,8 +50,9 @@
 		// pointer-events: none;
 	}
 }
-.meaning{
-	border:1px solid #eee;
+
+.meaning {
+	border: 1px solid #eee;
 	margin: 10px;
 	padding: 10px;
 }
