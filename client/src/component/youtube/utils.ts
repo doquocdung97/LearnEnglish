@@ -1,12 +1,6 @@
 import { getRandomNumber, getRandomNumbers, randomSort, separateWords } from "../../common/utils";
+import { DictionaryModel } from "../dictionary/utils";
 
-export class DictionaryModel {
-	id: number = 0
-	start: number = 0
-	dur: number = 0
-	word: string = String()
-	level: number = 0
-}
 export class Subtitle {
 	start: number = 0
 	dur: number = 0
@@ -50,10 +44,10 @@ export class Subtitles {
 	getSubtitleActive() {
 
 	}
-	generateExercise() {
+	generateExercise(numberword:number) {
 		this._data.map((item: Subtitle) => {
 			if (item.texts.length > 1)
-				item.exercise = new Exercise(item, this, 2);
+				item.exercise = new Exercise(item, this, numberword);
 		})
 	}
 	generateExerciseDictionary(dictionarys: DictionaryModel[]) {
@@ -122,10 +116,12 @@ export class Exercise {
 		}
 		separate.map((text: string, index: number) => {
 			var hide = true
-			if (this._numberword != 0 && this._words.length == 0) {
-				hide = randoms.find(x => x === index) != undefined
-			}else if(this._words.length == 0 || this._words.filter(x=>x.replace(/[!.,?]/g, String()) == text.replace(/[!.,?]/g, String())).length == 0){
-				hide = false
+			if(this._numberword != 0){
+				if (this._numberword != 0 && this._words.length == 0) {
+					hide = randoms.find(x => x === index) != undefined
+				}else if(this._words.length == 0 || this._words.filter(x=>x.replace(/[!.,?]/g, String()) == text.replace(/[!.,?]/g, String())).length == 0){
+					hide = false
+				}
 			}
 			if (hide) {
 				this._answer.push(text)

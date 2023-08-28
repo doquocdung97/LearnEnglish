@@ -23,14 +23,14 @@ const schema = new GraphQLSchema({
 		fields: {
 			translate: {
 				args:{
-					word:{
+					text:{
 						type:GraphQLString
 					}
 				},
 				type: TranslateSchema,
 				resolve: async (source: any, args: any, context: any, info: any) => {
 					try {
-						return translaterepo.audioAndText(args.word)
+						return translaterepo.audioAndText(args.text)
 					} catch (error) {
 						console.error(error)
 					}

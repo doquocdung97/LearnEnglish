@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react"
-import { DELETE_DICTIONARYVIDEO, DICTIONARYVIDEOS } from "../../../graphql/dictionary"
-import GraphqlHelper from "../../../graphql"
-import { DictionaryModel, Subtitles as SubtitlesModel } from "../utils"
+import { DELETE_DICTIONARYVIDEO, DICTIONARYVIDEOS } from "../../graphql/dictionary"
+import GraphqlHelper from "../../graphql"
+import {  Subtitles as SubtitlesModel } from "../youtube/utils"
 import './style.scss';
-import { Icon } from "../../icon";
-import { ButtonIcon } from "../../Button";
+import { Icon } from "../icon";
+import { ButtonIcon } from "../Button";
 import { Link } from "react-router-dom";
+import { DictionaryModel } from "./utils";
 
 class Pagination {
     pageSize: number = 0

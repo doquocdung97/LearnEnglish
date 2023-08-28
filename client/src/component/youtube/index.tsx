@@ -9,12 +9,13 @@ import axios from 'axios';
 import { Icon } from '../icon';
 import { Variables } from '../../constants';
 import Test from './Test';
-import { DictionaryModel, Subtitle, Subtitles as SubtitlesModel, WordQuestion } from './utils';
+import { Subtitle, Subtitles as SubtitlesModel, WordQuestion } from './utils';
 import GraphqlHelper from '../../graphql';
 import { DICTIONARYVIDEOS, CREATE_DICTIONARYVIDEO, SEARCH_DICTIONARY } from '../../graphql/dictionary';
-import { Dictionary } from './dictionary';
+import { Dictionary } from '../dictionary';
 import { Subtitles } from './Subtitle';
 import { VIDEO_DETAIL } from '../../graphql/video';
+import { DictionaryModel } from '../dictionary/utils';
 // import captions from '../../data/captions.json';
 // getSubtitles({
 //   videoID: '8jPQjjsBbIc', // youtube video id
@@ -76,10 +77,10 @@ function WordModal(props: any) {
 	const { show, handleClose, word, onHandleSave } = props
 	const [rowdata, setRowdata] = useState<{
 		translate: "",
-		phonetics: [{
+		phonetic: {
 			text: "",
 			audio: ""
-		}],
+		},
 		meanings: [
 			{
 				type: "",
@@ -120,20 +121,15 @@ function WordModal(props: any) {
 							<div>
 
 								{
-									rowdata.phonetics.map(phonetic => {
-										if (phonetic) {
-											return phonetic.audio && (
-												<>
-													<p>text: <strong>{phonetic.text}</strong> <Icon iconName='VolumeUpFill' style={{ "cursor": "pointer" }} onClick={() => {
-														let audio = new Audio(phonetic.audio)
-														audio.play()
-													}}></Icon></p>
-													{/* <label>audio: {phonetic.audio}</label> */}
-												</>
-											)
-										}
-
-									})
+									(rowdata.phonetic && rowdata.phonetic.audio) && (
+										<>
+											<p>text: <strong>{rowdata.phonetic.text}</strong> <Icon iconName='VolumeUpFill' style={{ "cursor": "pointer" }} onClick={() => {
+												let audio = new Audio(rowdata.phonetic.audio)
+												audio.play()
+											}}></Icon></p>
+											{/* <label>audio: {phonetic.audio}</label> */}
+										</>
+									)
 								}
 							</div>
 							<div>
@@ -234,6 +230,7 @@ function SubTitleActive(props: any) {
 interface VideoPlayerProps {
 	videoId: string | undefined
 	test?: boolean
+	level?: number 
 	onReady?: (event: SubtitlesModel) => void;
 }
 interface VideoPlayerState {
@@ -298,7 +295,13 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 				if (self.props.onReady && model) {
 					await self.props.onReady(model)
 				} else if (self.props.test && model) {
-					model.generateExercise()
+					var worknumber = 0
+					if(this.props.level == 1){
+						worknumber = 2
+					}else if(this.props.level == 3){
+						worknumber = 2
+					}
+					model.generateExercise(worknumber)
 				}
 				self.setState({ model: model })
 			}
@@ -471,7 +474,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 
 						</Col>
 						{
-							this.props.test && (<Test level={1} data={subCurrent} subtitles={this.state.model} next={this.nextSub.bind(this)} />)
+							this.props.test && (<Test level={this.props.level} data={subCurrent} subtitles={this.state.model} next={this.nextSub.bind(this)} />)
 						}
 
 					</Row>

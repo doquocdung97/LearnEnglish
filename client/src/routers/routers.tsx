@@ -16,8 +16,9 @@ const Routes = [
 			{ path: "/myvideo", element: <MyVideo /> },
 			{ path: "/videos", element: <Videos /> },
 			{ path: "/video/:id", element: <DetailVideo /> },
-			{ path: "/video/test/:id", element: <DetailTestVideo /> },
-			{ path: "/video/dictionary/:id", element: <DetailDictionary /> },
+			{ path: "/video/test/:id/:level", element: <DetailTestVideo /> },
+			{ path: "/video/dictionary/:id/", element: <DetailDictionary /> },
+			{ path: "/video/dictionary/:id/:level", element: <DetailDictionary /> },
 		],
 	}
 ];

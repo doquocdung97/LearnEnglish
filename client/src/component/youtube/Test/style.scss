@@ -25,6 +25,8 @@
 			padding: 5px;
 			&.error{
 				border: 1px solid $color02;
+				// background: transparent;
+				// color: #000;
 			}
 			&:focus-visible {
 				outline: none;
@@ -35,17 +37,19 @@
 			@include t-title-01;
 			min-height: 20px;
 		}
-		.active{
-			border: 1px solid transparent;
-			min-width: 100px;
-			width: auto;
-			@include active_background;
-		}
-		.error{
-			border: 1px solid transparent;
-			min-width: 100px;
-			width: auto;
-			@include error_background;
+		button{
+			&.active{
+				border: 1px solid transparent;
+				min-width: 100px;
+				width: auto;
+				@include active_background;
+			}
+			&.error{
+				border: 1px solid transparent;
+				min-width: 100px;
+				width: auto;
+				@include error_background;
+			}
 		}
 	}
 	.answer{

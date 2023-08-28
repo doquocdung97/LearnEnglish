@@ -1,24 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react"
 import Youtube from "../../component/youtube";
 import { useParams } from 'react-router-dom';
 import GraphqlHelper from "../../graphql";
-import { DICTIONARYVIDEOS } from "../../graphql/dictionary";
+import { DICTIONARYVIDEOS, DICTIONARYVIDEOS_DETAIL } from "../../graphql/dictionary";
+import { Levels } from "../../component/dictionary/Test";
 
 const graphql = new GraphqlHelper()
 function DetailDictionary(props:any){
-	const { id } = useParams();
-	return (<Youtube videoId={id} test={true} onReady={async (model)=>{
-        const query: any = await graphql.query(DICTIONARYVIDEOS, {
-            videoId: id,
-            pagination: {
-                page: 1,
-                pageSize: 1000
-            }
-        })
-        const result = query?.dictionaryByVideo
-        if (result?.data.length > 0) {
-            model?.generateExerciseDictionary(result.data)
-        }
-    }}/>)
+	const { id, level } = useParams();
+    const levelnew = level ? parseInt(level) : 0
+	var TextLevel = Levels[0]
+	if (Levels[levelnew]) {
+		TextLevel = Levels[levelnew]
+	}
+	return (<TextLevel {...props} id={id}></TextLevel>)
 }
 export default DetailDictionary

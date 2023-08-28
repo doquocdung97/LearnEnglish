@@ -1,6 +1,5 @@
 
-import { request } from '../common/request'
-import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import {  gql } from '@apollo/client';
 export const CREATE_DICTIONARYVIDEO = gql`
 mutation CreateDictionaryByVideo($videoId: String!, $word: String!, $start: Float!, $dur: Float!) {
   createDictionaryByVideo(VideoId: $videoId, word: $word, start: $start, dur: $dur) {
@@ -33,7 +32,65 @@ query DictionaryByVideo($videoId: String!, $pagination: PaginationInput) {
   }
 }
 `;
-
+export const DICTIONARYVIDEOS_DETAIL = gql`
+query DictionaryByVideo($videoId: String!, $pagination: PaginationInput) {
+  dictionaryByVideo(VideoId: $videoId, pagination: $pagination) {
+    pagination {
+      pageCount
+      total
+    }
+    data {
+      id
+      level
+      word
+      start
+      dur
+      detail {
+        word
+        translate
+        phonetic {
+          audio
+          text
+        }
+        meanings {
+          definitions {
+            definition
+            example
+          }
+          type
+        }
+      }
+    }
+  }
+}
+`;
+export const LEAN_DICTIONARYVIDEOS = gql`
+query LeanDictionaryByVideo($videoId: String!, $size: Int, $random: Boolean) {
+  LeanDictionaryByVideo(VideoId: $videoId, size: $size, random: $random) {
+    id
+      level
+      word
+      start
+      dur
+      detail {
+        word
+        translate
+        phonetic {
+          audio
+          text
+        }
+        meanings {
+          definitions {
+            definition
+            example
+            exercise
+          }
+          type
+        }
+      }
+  }
+}
+`;
 export const DELETE_DICTIONARYVIDEO = gql`
 mutation DeleteDictionaryByVideo($id: Int!) {
   deleteDictionaryByVideo(id: $id) {
@@ -44,7 +101,7 @@ mutation DeleteDictionaryByVideo($id: Int!) {
 `;
 
 export const SEARCH_DICTIONARY = gql`
-query SearchDictionary($word: String) {
+query SearchDictionary($word: String!) {
   searchDictionary(word: $word) {
     pagination {
       pageCount
@@ -53,7 +110,7 @@ query SearchDictionary($word: String) {
     data {
       word
       translate
-      phonetics {
+      phonetic {
         text
         audio
       }
