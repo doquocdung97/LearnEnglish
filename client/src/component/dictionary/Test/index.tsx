@@ -155,13 +155,13 @@ function Level1(props: any) {
         if (rowDatas && rowDatas[indexCurrent].exersice) {
             const exersice = rowDatas[indexCurrent].exersice
             const answer = exersice?.options[selectOption - 1]
+            const phonetic = rowDatas[indexCurrent].detail.phonetic
+            if (phonetic) {
+                const audio = new Audio(phonetic.audio)
+                audio.play()
+            }
             if (answer?.text == exersice?.answer) {
                 rowDatas[indexCurrent].complete = true
-                const phonetic = rowDatas[indexCurrent].detail.phonetic
-                if (phonetic) {
-                    const audio = new Audio(phonetic.audio)
-                    audio.play()
-                }
             } else {
                 if (answer) {
                     answer.error = true
