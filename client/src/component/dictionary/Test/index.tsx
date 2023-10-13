@@ -11,6 +11,8 @@ import { Button } from "react-bootstrap";
 import { Icon } from "../../icon";
 import { getRandom, getRandomNumber, randomSort } from "../../../common/utils";
 import Translate from "../../Translate";
+import { useHotkeys } from 'react-hotkeys-hook';
+
 
 class HandleExersiceDictionary {
     rowDatas: Dictionary[]
@@ -47,6 +49,9 @@ class HandleExersiceDictionary {
             // }
         })
         return model
+    }
+    random(){
+        this.rowDatas = randomSort(this.rowDatas)
     }
 }
 export class OptionDictionary {
@@ -86,6 +91,14 @@ function Level1(props: any) {
     var option = {
         pageCount: 10
     }
+    useHotkeys('1,2,3,4', (e) => {
+        const index = parseInt(e.key)
+        if(index >=0 && index <= 4){
+            onSelectOption(index)
+        }
+    })
+    
+
     const fetch = async (page: number = 1) => {
         if (page > 1 && page >= option.pageCount) {
             return
@@ -106,9 +119,6 @@ function Level1(props: any) {
             // this.setState({ rowDatas: [...this.state ? this.state.rowDatas : [], ...result.data], pagination: pagination })
         }
     }
-
-
-
     const next = async () => {
         var index = indexCurrent
         const rowDatas = model?.rowDatas
@@ -182,6 +192,26 @@ function Level1(props: any) {
         }
         setHasReply(true)
     }
+     const learnAgain = ()=>{
+        const rowDatas = model?.rowDatas
+        if(rowDatas){
+            rowDatas.map(item=>{
+                item.complete = false
+            })
+        }
+        model?.random()
+        setIndexCurrent(0)
+        setHasReply(false)
+        setAnswerError(false)
+        setSelectOption(0)
+    }
+    const learnMore = ()=>{
+        fetch()
+        setIndexCurrent(0)
+        setHasReply(false)
+        setAnswerError(false)
+        setSelectOption(0)
+    }
     useEffect(() => {
         fetch()
     }, [id]);
@@ -190,8 +220,18 @@ function Level1(props: any) {
         rowDatas = model?.rowDatas
     }
     const rowData = rowDatas ? rowDatas[indexCurrent] : null
+    const percent_complete =rowDatas ? ((rowDatas.length - rowDatas.filter(x => !x.complete).length) / rowDatas.length) * 100 : 0
+
+    useHotkeys('Enter', (e) => {
+        if(percent_complete >= 100){
+            learnMore()
+            return
+        }
+        if(selectOption>0){
+            relay()
+        }
+    })
     if (rowData) {
-        const percent_complete = ((rowDatas.length - rowDatas.filter(x => !x.complete).length) / rowDatas.length) * 100
         const phonetic = rowData.detail?.phonetic
         return (
             <>
@@ -267,9 +307,20 @@ function Level1(props: any) {
                         )
                     }
                     <div className="tools">
-                        <Button variant="warning" disabled={hasReply} onClick={forgot}>forgot the answer</Button>
-                        <Button variant="success" disabled={selectOption == 0} onClick={relay}>{`${hasReply ? "Continue" : "Reply"}`}</Button>
-
+                     
+                        {
+                            (percent_complete >= 100) && <>
+                                <Button variant="warning" onClick={learnAgain}>Learn again</Button>
+                                <Button  variant="success" onClick={learnMore}>Learn more</Button>
+                            </>
+                        }
+                        {
+                            (percent_complete < 100) && <>
+                            <Button variant="warning" disabled={hasReply} onClick={forgot}>forgot the answer</Button>
+                            <Button variant="success" disabled={selectOption == 0} onClick={relay}>{`${hasReply ? "Continue" : "Reply"}`}</Button>
+ 
+                           </>
+                        }
                     </div>
                 </div>
                 <Button onClick={next}>Next</Button>
@@ -335,6 +386,14 @@ function Level2(props: any) {
     const forgot = async () => {
         relay()
     }
+    useHotkeys('Enter', (e) => {
+        relay()
+    })
+    const onhandleKeyDown = async (event: any) => {
+        if (event.keyCode === 13) {
+            relay()
+        }
+    }
     const relay = async () => {
         const rowDatas = model?.rowDatas
         if (hasReply) {
@@ -373,12 +432,26 @@ function Level2(props: any) {
         }
         setHasReply(true)
     }
-    const onhandleKeyDown = async (event: any) => {
-        if (event.keyCode === 13) {
-            relay()
+    const learnAgain = ()=>{
+        const rowDatas = model?.rowDatas
+        if(rowDatas){
+            rowDatas.map(item=>{
+                item.complete = false
+            })
         }
+        model?.random()
+        setIndexCurrent(0)
+        setHasReply(false)
+        setInputValue(String())
+        setAnswerError(false)
     }
-
+    const learnMore = ()=>{
+        fetch()
+        setIndexCurrent(0)
+        setHasReply(false)
+        setInputValue(String())
+        setAnswerError(false)
+    }
     useEffect(() => {
         fetch()
         // const onEnterNext = (event: any) => {
@@ -405,7 +478,7 @@ function Level2(props: any) {
         // if(rowData.exersice){
         //     data = [...rowData.exersice.answer]
         // }
-
+        
         return (
             <>
                 <ProgressBar now={percent_complete} label={`${(percent_complete)}%`} />;
@@ -413,7 +486,22 @@ function Level2(props: any) {
                     {
                         rowData.exersice && (
                             <>
-                                <div className="question">{rowData.exersice.question}</div>
+                                <div className="question">{rowData.exersice.question}
+                                
+                                {
+                                     phonetic && phonetic.audio && (
+                                        <>
+                                            <div className="spelling">
+                                                <strong>{phonetic.text}</strong>
+                                                <Icon iconName='VolumeUpFill' style={{ "cursor": "pointer" }} onClick={() => {
+                                                    let audio = new Audio(phonetic.audio)
+                                                    audio.play()
+                                                }}></Icon>
+                                            </div>
+                                        </>
+                                    )
+                                }
+                                </div>
                                 <div className="answer-vs-input-answer">
                                     {
                                         !hasReply && (
@@ -470,9 +558,20 @@ function Level2(props: any) {
                         )
                     }
                     <div className="tools">
-                        <Button variant="warning" disabled={hasReply} onClick={forgot}>forgot the answer</Button>
+                        {
+                            (percent_complete >= 100) && <>
+                            <Button variant="warning" onClick={learnAgain}>Learn again</Button>
+                            <Button  variant="success" onClick={learnMore}>Learn more</Button>
+                        </>
+                        }
+                        {
+                            (percent_complete < 100) && <>
+                            <Button variant="warning" disabled={hasReply} onClick={forgot}>forgot the answer</Button>
                         <Button  ref={buttonRef} variant="success" onClick={relay}>{`${hasReply ? "Continue" : "Reply"}`}</Button>
 
+                           </>
+                        }
+                       
                     </div>
                 </div>
                 <Button onClick={next}>Next</Button>

@@ -194,11 +194,11 @@ function Level3(props: any) {
 		}
 	}
 	const onSuggest = () => {
-		exercise?.suggest()
+		exercise?.suggestnew()
 		setUpdate(new Date())
-		if (exercise && autoSubmit && exercise.isSend) {
-			onCheckAnswer()
-		}
+		// if (exercise && autoSubmit && exercise.isSend) {
+		// 	onCheckAnswer()
+		// }
 	}
 	const handleKeyDown = (event:any) => {
 		if (event.key === 'Enter' || event.key === ' ') {
@@ -262,6 +262,7 @@ function Level3(props: any) {
 										}}
 										value={item.reply != null ? item.reply.trim() : String()}
 										key={index}
+										placeholder={item.suggest}
 										data-index={tabindex}
 										type="text"
 										className={item.error ? "error" : String()} />

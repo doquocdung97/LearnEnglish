@@ -77,6 +77,7 @@ export class Subtitles {
 export class WordQuestion {
 	text: string = String()
 	reply: string | null = null
+	suggest: string = String()
 	hide: boolean = false;
 	error: boolean = false;
 	check(): boolean {
@@ -191,6 +192,23 @@ export class Exercise {
 				word.reply = word.text
 				word.error = false
 				this._replycount++;
+				let option = this._options.find(x => x.text == word.text)
+				if (option) {
+					option.hide = true
+				}
+				return
+			}
+		}
+	}
+	suggestnew() {
+		for (let index = 0; index < this._question.length; index++) {
+			const word = this._question[index];
+			if (word.hide && (!word.suggest)) {
+				// word.reply = word.text
+				word.reply = String()
+				word.suggest = word.text
+				word.error = false
+				// this._replycount++;
 				let option = this._options.find(x => x.text == word.text)
 				if (option) {
 					option.hide = true

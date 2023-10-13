@@ -4,7 +4,8 @@ import { LoggerHelper } from "../common/loggerhelper";
 import YoutubeAPIHelper from "../common/youtube_api_helper";
 import { UserModel, UserTokenModel } from "../model/User";
 import { SubtitleModel, Thumbnail, VideoModel } from "../model/Video";
-import { getSubtitles } from "youtube-captions-scraper"
+// import { getSubtitles } from "youtube-captions-scraper"
+import { getSubtitles } from 'youtube-caption-extractor';
 
 export default class VideoRepository {
 	_logger: LoggerHelper
