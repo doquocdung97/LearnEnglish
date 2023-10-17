@@ -16,6 +16,7 @@ export class Thumbnail {
 export class VideoModel {
 	id: number
 	title: string
+	favorite:boolean = false
 	videoId: string
 	thumbnails: Thumbnail[] = []
 	publishedAt: Date

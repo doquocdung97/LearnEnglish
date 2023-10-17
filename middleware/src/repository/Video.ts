@@ -25,18 +25,34 @@ export default class VideoRepository {
 		VideoRepository.instance = this;
 	}
 	// async get(lang:string): Promise<VideoModel[] | null>;
-	async get(id: string, lang: string = 'en'): Promise<VideoModel | null> {
+	async get(userId: string, id: string, lang: string = 'en'): Promise<VideoModel | null> {
 
-		let request = await this._youtubeHelper.fetch_data('/videos', {
-			part: "snippet",
-			id
-		})
-		if (request && request.items) {
-			const model = new VideoModel(request.items[0])
-			// model.subtitles = subtitles
-			return model
+		try {
+			let request = await this._youtubeHelper.fetch_data('/videos', {
+				part: "snippet",
+				id
+			})
+			if (request && request.items) {
+				const model = new VideoModel(request.items[0])
+				if (userId) {
+					const variables = {
+						"videoId": id,
+						"userId": userId
+					}
+					const query: any = await this._cmsHelper.query(GRAPHQL_USER.VIDEO, variables)
+					if (query && query.videos?.data && query.videos?.data.length > 0) {
+						model.favorite = true
+					}
+				}
+				// model.subtitles = subtitles
+				return model
+			}
+			return null
+		} catch (error) {
+			let msg = `error get: ${error}\nuserId: ${userId} videoId: ${id}`
+			this._logger.error(msg)
+			throw new Error(msg)
 		}
-		return null
 	}
 	async getSubTitle(id: string, lang: string = "en") {
 		return await getSubtitles({
@@ -50,7 +66,33 @@ export default class VideoRepository {
 	}
 	async myVideos(userId: number): Promise<VideoModel[]> {
 		const models = []
-		const query: any = await this._cmsHelper.query(GRAPHQL_USER.VIDEOS, { userId: userId })
+		const query: any = await this._cmsHelper.query(GRAPHQL_USER.VIDEOS_BY_USER, { userId: userId })
+		if (query && query.videos) {
+			let videoids = []
+			let data = query.videos.data
+			data.map((item: any) => {
+				let attr = item.attributes
+				if (attr?.VideoId) {
+					videoids.push(attr.VideoId)
+				}
+			})
+			let request = await this._youtubeHelper.fetch_data('/videos', {
+				part: "snippet",
+				id: videoids.toString()
+			})
+			if (request && request.items) {
+				request.items.map((item: any) => {
+					const model = new VideoModel(item)
+					models.push(model)
+				})
+			}
+			return models
+		}
+		return []
+	}
+	async globleVideos(): Promise<VideoModel[]> {
+		const models = []
+		const query: any = await this._cmsHelper.query(GRAPHQL_USER.GLOBAL_VIDEOS)
 		if (query && query.videos) {
 			let videoids = []
 			let data = query.videos.data
@@ -81,7 +123,7 @@ export default class VideoRepository {
 			"userid": userId
 		}
 		try {
-			const query: any = await this._cmsHelper.query(GRAPHQL_USER.VIDEOS, { userId: userId })
+			const query: any = await this._cmsHelper.query(GRAPHQL_USER.VIDEOS_BY_USER, { userId: userId })
 			if (query && query.videos) {
 				let checkdataintable = query.videos.data.find(n => n.attributes?.VideoId == videoId)
 				if (!checkdataintable) {

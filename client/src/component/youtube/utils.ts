@@ -57,7 +57,7 @@ export class Subtitles {
 			for (let index = 0; index < item.texts.length; index++) {
 				const text = item.texts[index];
 				
-				if (dictionarys_temp.filter(n => n.toLowerCase().trim().replace(/[!.,?]/g, String()) == text.toLowerCase().trim().replace(/[!.,?]/g, String())).length > 0) {
+				if (dictionarys_temp.filter(n => n.toLowerCase().trim().replace(/[!.,?]/g, String()) === text.toLowerCase().trim().replace(/[!.,?]/g, String())).length > 0) {
 					texts.push(text)
 				}
 				// console.log(texts)
@@ -112,15 +112,15 @@ export class Exercise {
 	init() {
 		var separate = separateWords(this._subtitle.text)
 		var randoms: number[] = []
-		if (separate.length > 1 && this._words.length == 0) {
+		if (separate.length > 1 && this._words.length === 0) {
 			randoms = getRandomNumbers(0, separate.length - 1, this._numberword)
 		}
 		separate.map((text: string, index: number) => {
 			var hide = true
 			if(this._numberword != 0){
-				if (this._numberword != 0 && this._words.length == 0) {
+				if (this._numberword != 0 && this._words.length === 0) {
 					hide = randoms.find(x => x === index) != undefined
-				}else if(this._words.length == 0 || this._words.filter(x=>x.replace(/[!.,?]/g, String()) == text.replace(/[!.,?]/g, String())).length == 0){
+				}else if(this._words.length === 0 || this._words.filter(x=>x.replace(/[!.,?]/g, String()) === text.replace(/[!.,?]/g, String())).length === 0){
 					hide = false
 				}
 			}
@@ -167,7 +167,7 @@ export class Exercise {
 		// this._replys.push(text)
 	}
 	removeReply(word: WordQuestion) {
-		const option = this._options.find(x => x.text == word.reply && x.hide)
+		const option = this._options.find(x => x.text === word.reply && x.hide)
 		if (option) {
 			option.hide = false
 			word.reply = null
@@ -192,7 +192,7 @@ export class Exercise {
 				word.reply = word.text
 				word.error = false
 				this._replycount++;
-				let option = this._options.find(x => x.text == word.text)
+				let option = this._options.find(x => x.text === word.text)
 				if (option) {
 					option.hide = true
 				}
@@ -209,7 +209,7 @@ export class Exercise {
 				word.suggest = word.text
 				word.error = false
 				// this._replycount++;
-				let option = this._options.find(x => x.text == word.text)
+				let option = this._options.find(x => x.text === word.text)
 				if (option) {
 					option.hide = true
 				}
@@ -218,7 +218,7 @@ export class Exercise {
 		}
 	}
 	get isSend(): boolean {
-		return this._replycount == this._answer.length
+		return this._replycount === this._answer.length
 	}
 	get Question() {
 		return this._question

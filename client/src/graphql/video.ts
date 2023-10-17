@@ -13,6 +13,27 @@ query MyVideos {
         width
       }
     }
+    pagination {
+      total
+      pageCount
+    }
+  }
+}
+`;
+
+export const GLOBAL_VIDEOS = gql`
+query videos {
+  videos {
+    data {
+      id
+      title
+      publishedAt
+      thumbnails {
+        url
+        height
+        width
+      }
+    }
   }
 }
 `;
@@ -20,6 +41,7 @@ query MyVideos {
 export const VIDEO_DETAIL = gql`
 query video($videoId: String!) {
   video(id: $videoId) {
+    favorite
     subtitles {
       dur
       start
@@ -27,5 +49,22 @@ query video($videoId: String!) {
     }
   }
 }
+`;
 
+export const MUTATION_CREATE_MY_VIDEO = gql`
+mutation CreateMyVideo($videoId: String) {
+  createMyVideo(videoId: $videoId) {
+    code
+    success
+  }
+}
+`;
+
+export const MUTATION_DELETE_MY_VIDEO = gql`
+mutation DeleteMyVideo($videoId: String) {
+  deleteMyVideo(videoId: $videoId) {
+    code
+    success
+  }
+}
 `;

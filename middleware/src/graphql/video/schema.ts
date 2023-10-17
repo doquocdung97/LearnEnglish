@@ -58,6 +58,9 @@ export const VideoSchema = new GraphQLObjectType({
 		id: {
 			type: GraphQLString,
 		},
+		favorite: {
+			type: GraphQLBoolean
+		},
 		// videoId: {
 		// 	type: GraphQLString,
 		// },

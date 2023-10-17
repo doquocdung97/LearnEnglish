@@ -1,0 +1,51 @@
+@for $value from 0 through 100 {
+	// .p-#{$value} {
+	// 	padding: (1px * $value) !important;
+	// }
+
+	// .pt-#{$value} {
+	// 	padding-top: (1px * $value) !important;
+	// }
+
+	// .pb-#{$value} {
+	// 	padding-bottom: (1px * $value) !important;
+	// }
+
+	// .pl-#{$value} {
+	// 	padding-left: (1px * $value) !important;
+	// }
+
+	// .pr-#{$value} {
+	// 	padding-right: (1px * $value) !important;
+	// }
+
+	// .m-#{$value} {
+	// 	margin: (1px * $value) !important;
+	// }
+
+	// .mt-#{$value} {
+	// 	margin-top: (1px * $value) !important;
+	// }
+
+	// .mb-#{$value} {
+	// 	margin-bottom: (1px * $value) !important;
+	// }
+
+	// .ml-#{$value} {
+	// 	margin-left: (1px * $value) !important;
+	// }
+
+	// .mr-#{$value} {
+	// 	margin-right: (1px * $value) !important;
+	// }
+}
+
+@for $value from 0 through 1000 {
+	.w-#{$value} {
+		width: (1px * $value) !important;
+	}
+
+	.h-#{$value} {
+		height: (1px * $value) !important;
+	}
+}

@@ -1,18 +1,21 @@
 // import { ApolloClient, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 import { GraphQLClient } from "graphql-request";
+import { getAccessTokenFromStorage } from "../helpers";
+import { Config } from "../constants";
 
 export default class GraphqlHelper {
 	_setting: any
 	_client: GraphQLClient
 	constructor() {
 		this._setting = {
-			"ENDPOINT": `http://192.168.1.50:3001/v1/graphql`,
+			"ENDPOINT": `${Config.MIDDLEWARE_ENDPOINT}/v1/graphql`,
 		}
 
 		this._client = new GraphQLClient(this._setting.ENDPOINT);
 	}
 	getToken(){
-		return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjk3MTQ5NTA3LCJleHAiOjE2OTk3NDE1MDd9.F_ufhuHjDcwYbeV4c9Qy4Eqeuu4-4YDlBWzFU-QS4V8"
+		const data = getAccessTokenFromStorage()
+		return data?.accessToken
 	}
 	async query(query: any, variables: any = {}) {
 		try {

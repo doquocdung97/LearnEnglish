@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react"
 import { DELETE_DICTIONARYVIDEO, DICTIONARYVIDEOS } from "../../graphql/dictionary"
 import GraphqlHelper from "../../graphql"
-import {  Subtitles as SubtitlesModel } from "../youtube/utils"
+import { Subtitles as SubtitlesModel } from "../youtube/utils"
 import './style.scss';
 import { Icon } from "../icon";
 import { ButtonIcon } from "../Button";
 import { Link } from "react-router-dom";
 import { DictionaryModel } from "./utils";
+import DictionaryDetail from "./detail";
 
 class Pagination {
     pageSize: number = 0
@@ -17,17 +18,19 @@ class Pagination {
 interface DictionaryState {
     rowDatas: DictionaryModel[]
     pagination: Pagination
+    show: boolean
+    word: string
 }
 interface DictionaryProps {
     model: SubtitlesModel | null
-    videoId: string| undefined
+    videoId: string | undefined
 }
 const graphql = new GraphqlHelper()
 
 
 function DictionaryItem(props: any) {
     const [isLoadingDelete, setIsLoadingDelete] = useState(false)
-    const { data, onDelete } = props
+    const { data, onDelete,onDetail } = props
     const onHandleDelete = async (data: DictionaryModel) => {
         setIsLoadingDelete(true)
         let status = await onDelete(data)
@@ -43,7 +46,7 @@ function DictionaryItem(props: any) {
             </div>
 
             <div className='tools'>
-                <button className='btn-icon-sm'><Icon iconName='InfoLg'></Icon></button>
+                <button className='btn-icon-sm' onClick={()=>{onDetail(data.word)}}><Icon iconName='InfoLg'></Icon></button>
                 <ButtonIcon onClick={() => onHandleDelete(data)} loading={isLoadingDelete} iconName='XLg'></ButtonIcon>
             </div>
         </div>
@@ -59,6 +62,8 @@ export class Dictionary extends React.Component<DictionaryProps, DictionaryState
         super(props)
         this.elemRef = React.createRef();
         this.state = {
+            show: false,
+            word: String(),
             pagination: {
                 page: 1,
                 pageSize: 10,
@@ -111,7 +116,9 @@ export class Dictionary extends React.Component<DictionaryProps, DictionaryState
             this.fetch(page)
         }
     }
-
+    onDetail(word: string) {
+        this.setState({ show: true, word: word })
+    }
     private async onDelete(item: any) {
         const query: any = await graphql.query(DELETE_DICTIONARYVIDEO, { id: item.id })
         const result = query?.deleteDictionaryByVideo
@@ -127,19 +134,23 @@ export class Dictionary extends React.Component<DictionaryProps, DictionaryState
         }
         return false
     }
+    handleClose() {
+        this.setState({ show: false })
+    }
     render() {
         return (
             <div className="dictionarys">
-                <div className="tools">
+                {/* <div className="tools">
                     <Link to={`/video/dictionary/${this.props.videoId}`}>go test</Link>
-                </div>
+                </div> */}
                 <div ref={this.elemRef} className="list">
                     {
                         this.state?.rowDatas?.map((item: any) => {
-                            return (<DictionaryItem data={item} onDelete={this.onDelete.bind(this)} />)
+                            return (<DictionaryItem data={item} onDelete={this.onDelete.bind(this)} onDetail={this.onDetail.bind(this)} />)
                         })
                     }
                 </div>
+                <DictionaryDetail show={this.state.show} word={this.state.word} handleClose={this.handleClose.bind(this)}></DictionaryDetail>
             </div>
         )
     }

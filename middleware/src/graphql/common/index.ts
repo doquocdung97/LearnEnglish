@@ -24,6 +24,10 @@ export const BaseResultCode = new GraphQLEnumType({
 		},
 		B002: {
 			value: 2
+		},
+		B003: {
+			value: 3,
+			description:"No user found."
 		}
 	},
 })

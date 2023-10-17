@@ -53,9 +53,21 @@ export class GRAPHQL_USER {
     }
   }
   `
-  static readonly VIDEOS = gql`
+  static readonly VIDEOS_BY_USER = gql`
   query videos($userId:ID){
     videos(filters:{user:{id:{eq:$userId}}}){
+      data{
+        attributes{
+          VideoId
+          level
+        }
+      }
+    }
+  }
+  `
+  static readonly GLOBAL_VIDEOS= gql`
+  query videos{
+    videos(filters:{user:{id:{eq:null}}}){
       data{
         attributes{
           VideoId

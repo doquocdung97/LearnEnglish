@@ -51,7 +51,7 @@
 
         .answer {
             &.error {
-                border-radius: 10px;
+                border-radius: var(--radius);
                 padding: 10px;
                 background: #fda9a9;
             }

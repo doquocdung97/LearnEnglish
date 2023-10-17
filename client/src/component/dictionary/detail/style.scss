@@ -1,0 +1,33 @@
+.dictionary-detail {
+	.translate {}
+
+	.detail {}
+
+	.meanings {
+		.meaning {
+			// border-radius: var(--radius);
+			// box-shadow: var(--card-shadow);
+			// padding: 10px;
+			// .txt-type{
+
+			// }
+			.definitions-example {
+				padding: 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+
+				.txt {
+					border-radius: var(--radius);
+					box-shadow: var(--card-shadow);
+					padding: 10px;
+
+					p {
+						padding: 0;
+						margin: 0;
+					}
+				}
+			}
+		}
+	}
+}

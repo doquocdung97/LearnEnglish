@@ -30,7 +30,7 @@ function SubTitleItem(props: any) {
     if (active) {
         let top = getscrollTop()
         // console.log(`Row Top: ${top}`)
-        parentRef.current.scrollTo(0, (top - parentRef.current.clientHeight / 2))
+        parentRef.current?.scrollTo(0, (top - parentRef.current.clientHeight / 2))
     }
     let text = (<p>{data.text}</p>);
     if (test && data.exercise) {

@@ -32,16 +32,17 @@ class HandleExersiceDictionary {
             const option = new OptionDictionary()
             option.text = item.detail?.word
             options.push(option)
-            while (options.length < 4) {
-                let random = getRandomNumber(0, words.length - 1)
-                let word = words[random]
-                if ((options.find(x => x.text != word)) && word) {
-                    const option = new OptionDictionary()
-                    option.text = word
-                    options.push(option)
+            if(model.rowDatas.length >= 4){
+                while (options.length < 4) {
+                    let random = getRandomNumber(0, words.length - 1)
+                    let word = words[random]
+                    if ((options.find(x => x.text != word)) && word) {
+                        const option = new OptionDictionary()
+                        option.text = word
+                        options.push(option)
+                    }
                 }
             }
-
             exercise.options = randomSort(options)
             item.exersice = exercise
             // if(item.level ==0){
@@ -170,14 +171,14 @@ function Level1(props: any) {
                 const audio = new Audio(phonetic.audio)
                 audio.play()
             }
-            if (answer?.text == exersice?.answer) {
+            if (answer?.text === exersice?.answer) {
                 rowDatas[indexCurrent].complete = true
             } else {
                 if (answer) {
                     answer.error = true
                 }
                 if (exersice) {
-                    const option = exersice.options.find(x => x.text == exersice?.answer)
+                    const option = exersice.options.find(x => x.text === exersice?.answer)
                     if (option) {
                         const index = exersice?.options.indexOf(option)
                         if (index != undefined) {
@@ -250,7 +251,7 @@ function Level1(props: any) {
                                                         let status = String()
                                                         if (option.error) {
                                                             status = "error"
-                                                        } else if ((index + 1) == selectOption) {
+                                                        } else if ((index + 1) === selectOption) {
                                                             status = "active"
                                                         }
                                                         return <Button onClick={() => onSelectOption(index + 1)} variant="secondary" className={status}>{option.text}</Button>
@@ -317,7 +318,7 @@ function Level1(props: any) {
                         {
                             (percent_complete < 100) && <>
                             <Button variant="warning" disabled={hasReply} onClick={forgot}>forgot the answer</Button>
-                            <Button variant="success" disabled={selectOption == 0} onClick={relay}>{`${hasReply ? "Continue" : "Reply"}`}</Button>
+                            <Button variant="success" disabled={selectOption === 0} onClick={relay}>{`${hasReply ? "Continue" : "Reply"}`}</Button>
  
                            </>
                         }
@@ -414,7 +415,7 @@ function Level2(props: any) {
                 audio.play()
             }
             const exersice = rowDatas[indexCurrent].exersice
-            if (inputValue == exersice?.answer) {
+            if (inputValue === exersice?.answer) {
                 rowDatas[indexCurrent].complete = true
 
             } else {
