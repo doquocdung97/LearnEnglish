@@ -1,3 +1,4 @@
+import { Variables } from "../constants"
 import { UserModel } from "./User"
 
 export class SubtitleModel {
@@ -34,5 +35,14 @@ export class VideoModel {
 		}
 		this.title = obj.snippet?.title
 		this.publishedAt = obj.snippet?.publishedAt
+	}
+	static parseByYoutube(obj){
+		const model = new VideoModel(obj)
+		if (obj.id.kind == Variables.YOUTUBE_KIND_VIDEO){
+			model.id = obj.id.videoId
+		}else if (obj.kind == Variables.YOUTUBE_KIND_PLAYLISH && (obj.snippet.thumbnails != Object())){
+			model.id = obj.snippet.resourceId.videoId
+		}
+		return model
 	}
 }

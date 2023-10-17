@@ -1,7 +1,7 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
 import { Request, Response } from "express"
-import { getSubtitles } from "youtube-captions-scraper"
+import { getSubtitles } from 'youtube-caption-extractor';
 import apolloServer from "./graphql"
 import { Config } from "./constants"
 const cors = require('cors');

@@ -11,4 +11,9 @@ export class Variables{
   static readonly LEVEL_ERROR = 'error';
   static readonly LEVEL_INFO = 'info';
   static readonly LEVEL_WARNING = 'warn';
+
+  //youtube
+  static readonly YOUTUBE_KIND_VIDEO = 'youtube#video'
+  static readonly YOUTUBE_KIND_PLAYLISH= 'youtube#playlistItem'
+  static readonly YOUTUBE_MAX_RESULTS= 12
 }

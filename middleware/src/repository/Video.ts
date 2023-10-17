@@ -6,6 +6,8 @@ import { UserModel, UserTokenModel } from "../model/User";
 import { SubtitleModel, Thumbnail, VideoModel } from "../model/Video";
 // import { getSubtitles } from "youtube-captions-scraper"
 import { getSubtitles } from 'youtube-caption-extractor';
+import { Pagination, PaginationInput, PaginationModel } from "../model/common";
+import { Variables } from "../constants";
 
 export default class VideoRepository {
 	_logger: LoggerHelper
@@ -104,11 +106,11 @@ export default class VideoRepository {
 			}
 			try {
 				const query: any = await this._cmsHelper.query(GRAPHQL_USER.VIDEO, variables)
-				
+
 				if (query && query.videos?.data && query.videos?.data.length == 1) {
 					return query.videos?.data[0].id
 				}
-				
+
 				const querycreate: any = await this._cmsHelper.query(GRAPHQL_USER.CREATE_VIDEO, {
 					"videoid": videoId,
 					"publishedAt": new Date(),
@@ -152,5 +154,59 @@ export default class VideoRepository {
 			throw new Error(msg)
 		}
 		return false
+	}
+	async search(text: string, pagination: PaginationInput): Promise<PaginationModel<VideoModel> | null> {
+		var data: any = {
+			q: text,
+			pageToken: null
+		}
+		if (pagination) {
+			data.maxResults = pagination.pageSize
+			data.pageToken = pagination.pageToken
+		}
+		return this._fetch_data(data)
+	}
+	async videoByChannel(channelId: string, pagination: PaginationInput): Promise<PaginationModel<VideoModel>> {
+		var data: any = {
+			channelId: channelId,
+			pageToken: null
+		}
+		if (pagination) {
+			data.maxResults = pagination.pageSize
+			data.pageToken = pagination.pageToken
+		}
+		return this._fetch_data(data)
+	}
+	async videoByPlayList(playlistId: string, pagination: PaginationInput): Promise<PaginationModel<VideoModel>> {
+		var data: any = {
+			playlistId: playlistId,
+			pageToken: null
+		}
+		if (pagination) {
+			data.maxResults = pagination.pageSize
+			data.pageToken = pagination.pageToken
+		}
+		return this._fetch_data(data)
+	}
+	private async _fetch_data(data: any): Promise<PaginationModel<VideoModel>> {
+		if (!data.maxResults || data.maxResults < 1) {
+			data.maxResults = Variables.YOUTUBE_MAX_RESULTS
+		}
+		const model = new PaginationModel<VideoModel>()
+		var result = await this._youtubeHelper.listVideo(data)
+		if (result) {
+			var items = []
+			for (let index = 0; index < result.items.length; index++) {
+				const element = VideoModel.parseByYoutube(result.items[index]);
+				if (element) {
+					items.push(element)
+				}
+			}
+			model.data = items
+			model.pagination.total = result.pageInfo.totalResults
+			model.pagination.nextPageToken = result.nextPageToken
+			model.pagination.prevPageToken = result.prevPageToken
+		}
+		return model
 	}
 }

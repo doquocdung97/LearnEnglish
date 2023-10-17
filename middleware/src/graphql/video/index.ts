@@ -14,12 +14,13 @@ import {
 	GraphQLResolveInfo
 } from 'graphql';
 import { VideoSchema } from './schema';
-import { ResultBase, createResultPagination } from '../common';
+import { PaginationInputSchema, PaginationTokenInputSchema, ResultBase, createResultPagination, createResultPaginationToken } from '../common';
 import VideoRepository from '../../repository/Video';
+import { PaginationInput } from '../../model/common';
 
 // Create the GraphQL schema
 const videorepo = new VideoRepository()
-const PaginationVideosResult = createResultPagination('Videos', VideoSchema)
+const PaginationVideosResult = createResultPaginationToken('Videos', VideoSchema)
 const schema = new GraphQLSchema({
 	query: new GraphQLObjectType({
 		name: 'Query',
@@ -66,6 +67,66 @@ const schema = new GraphQLSchema({
 					}
 				},
 			},
+			search:{
+				type: PaginationVideosResult,
+				args:{
+					text:{
+						type:new GraphQLNonNull(GraphQLString)
+					},
+					pagination:{
+						type:PaginationTokenInputSchema
+					}
+				},
+				resolve: async (source: any, args: any, context: any, info: any) => {
+					try {
+						const pagination = PaginationInput.parse(args.pagination)
+						return await videorepo.search(args.text,pagination)
+					} catch (error) {
+						console.error(error)
+					}
+					return null
+				},
+			},
+			youtubeByChannel:{
+				type: PaginationVideosResult,
+				args:{
+					channelId:{
+						type:new GraphQLNonNull(GraphQLString)
+					},
+					pagination:{
+						type:PaginationTokenInputSchema
+					}
+				},
+				resolve: async (source: any, args: any, context: any, info: any) => {
+					try {
+						const pagination = PaginationInput.parse(args.pagination)
+						return await videorepo.videoByChannel(args.channelId,pagination)
+					} catch (error) {
+						console.error(error)
+					}
+					return null
+				},
+			},
+			youtubeByPlayList:{
+				type: PaginationVideosResult,
+				args:{
+					playlistId:{
+						type:new GraphQLNonNull(GraphQLString)
+					},
+					pagination:{
+						type:PaginationTokenInputSchema
+					}
+				},
+				resolve: async (source: any, args: any, context: any, info: any) => {
+					try {
+						const pagination = PaginationInput.parse(args.pagination)
+						return await videorepo.videoByPlayList(args.playlistId,pagination)
+					} catch (error) {
+						console.error(error)
+					}
+					return null
+				},
+			}
 		}
 	}),
 	mutation: new GraphQLObjectType({
