@@ -1,3 +1,5 @@
+import { Variables } from "../constants";
+
 export function separateWords(sentence: string) {
   if (!sentence)
     return []
@@ -18,7 +20,7 @@ export function getRandomNumbers(min: number, max: number, number: number) {
     var vals: number[] = []
     while (vals.length < number) {
       let random = Math.floor(Math.random() * (max - min + 1)) + min;
-      if (vals.length == 0 || vals.find(x => x == random) == undefined) {
+      if (vals.length === 0 || vals.find(x => x === random) === undefined) {
         vals.push(random)
       }
       // console.log(random)
@@ -33,11 +35,24 @@ export function getRandom() {
   return Math.random() - 0.5; // Subtracting 0.5 to get both positive and negative values
 }
 
-export function randomSort(list:any){
+export function randomSort(list: any) {
   const sort = () => {
     return getRandom();
   }
   list.sort(sort);
   return list
+}
+export function getTokenFromStorage() {
+  let token = localStorage?.getItem(Variables.TOKEN_KEY)
+  if (token)
+    return JSON.parse(token);
+}
+export function isEmptyObject(obj:any) {
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key) && obj[key]) {
+      return false;
+    }
+  }
+  return true;
 }
 // export {}

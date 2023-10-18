@@ -1,39 +1,27 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import './style.scss';
 // const { getSubtitles } = require('youtube-captions-scraper');
-import { Container, Row, Col, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, Dropdown, Modal, Button, Tab, Tabs, ButtonGroup } from 'react-bootstrap';
+// import Tab from 'react-bootstrap/Tab';
+// import Tabs from 'react-bootstrap/Tabs';
 import YouTubeIframe from 'react-youtube';
 import axios from 'axios';
 import { Icon } from '../icon';
 import { Variables } from '../../constants';
 import Test from './Test';
-import { Subtitles } from './utils';
-// import captions from '../../data/captions.json';
-// getSubtitles({
-//   videoID: '8jPQjjsBbIc', // youtube video id
-//   lang: 'en' // default: `en`
-// }).then((captions:any) => {
-//   // console.log(captions);
-// 	captions.map((item:any)=>{
-// 		console.log(`start: '${item.start}', dur: '${item.dur}', text: '${item.text}'`)
-// 	})
-// });
-class RowData {
-	public start: number = 0;
-	public dur: number = 0;
-	public text: string = String();
-	public active: boolean = false;
-	// public reload: boolean = false;
-	public repeat: boolean = false;
-	// constructor() {
-	// 	this.start = 0
-	// 	this.dur = 0
-	// 	this.text = String()
-	// 	this.active = false
-	// 	this.reload = false
-	// }
-}
+import { Subtitle, Subtitles as SubtitlesModel, WordQuestion } from './utils';
+import GraphqlHelper from '../../graphql';
+import { DICTIONARYVIDEOS, CREATE_DICTIONARYVIDEO, SEARCH_DICTIONARY } from '../../graphql/dictionary';
+import { Dictionary } from '../dictionary';
+import { Subtitles } from './Subtitle';
+import { MUTATION_CREATE_MY_VIDEO, MUTATION_DELETE_MY_VIDEO, VIDEO_DETAIL } from '../../graphql/video';
+import { DictionaryModel } from '../dictionary/utils';
+import { ButtonIcon } from '../Button';
+import DictionaryDetail from '../dictionary/detail'
+
+const graphql = new GraphqlHelper()
 function VideoPlayerTools(props: any) {
+	const [loadingFavorite, setLoadingFavorite] = useState(false)
 	const parent: VideoPlayer = props.parent
 	const tongePlayVideo = () => {
 		if (parent.state?.playVideo) {
@@ -43,125 +31,176 @@ function VideoPlayerTools(props: any) {
 		}
 	}
 	const opRepeat = () => {
-		if (parent.state?.subCurrent){
-			parent.setRepeat(parent.state?.subCurrent)
+		if (parent.state?.indexsub) {
+			parent.setRepeat(!parent.state?.repeat)
 		}
-								
+
 	}
 	return (
-		<div className='tools'>
-			<button className='btn' onClick={tongePlayVideo}><Icon iconName={parent.state?.playVideo ? 'Pause' : 'Play'} ></Icon></button>
-			{
-				!parent.props.test && (
-					<>
-						<button className='btn' onClick={parent.backSub.bind(parent)}><Icon iconName='ArrowLeft'></Icon></button>
-						<button className='btn' onClick={parent.nextSub.bind(parent)}><Icon iconName='ArrowRight'></Icon></button>
-						<button className='btn' onClick={parent.reloadSub.bind(parent)}><Icon iconName='ArrowClockwise'></Icon></button>
-						<button className={`btn ${parent.state?.subCurrent?.repeat ? 'active' : String()}`} onClick={opRepeat}><Icon iconName='ArrowRepeat'></Icon></button>
-					</>
-				)
-			}
-
-
-			<Dropdown>
-				<Dropdown.Toggle variant="success">
-					Speed {parent.state?.playbackSpeed}
-				</Dropdown.Toggle>
-
-				<Dropdown.Menu>
+		<div className='tools row'>
+			<Col sm={7}>
+				<div className='tool-video'>
+					<ButtonIcon onClick={tongePlayVideo} iconName={parent.state?.playVideo ? 'Pause' : 'Play'} size={30}></ButtonIcon>
 					{
-						Variables.PLAYBACKSPEEDS.map((speed: number, index: number) => {
-							return <Dropdown.Item key={index} onClick={() => { parent.setState({ playbackSpeed: speed }) }}>Speed {speed}</Dropdown.Item>
-						})
+						!parent.props.test && (
+							<>
+								<ButtonIcon onClick={parent.backSub.bind(parent)} size={30} iconName='ArrowLeft'></ButtonIcon>
+								<ButtonIcon onClick={parent.nextSub.bind(parent)} size={30} iconName='ArrowRight'></ButtonIcon>
+								<ButtonIcon onClick={parent.reloadSub.bind(parent)} size={30} iconName='ArrowClockwise'></ButtonIcon>
+								<ButtonIcon onClick={opRepeat} className={parent.state?.repeat ? 'active' : String()} size={30} iconName='ArrowRepeat'></ButtonIcon>
+							</>
+						)
 					}
-				</Dropdown.Menu>
-			</Dropdown>
+					<Dropdown>
+						<Dropdown.Toggle variant='default' size="sm">
+							Speed {parent.state?.playbackSpeed}
+						</Dropdown.Toggle>
+
+						<Dropdown.Menu>
+							{
+								Variables.PLAYBACKSPEEDS.map((speed: number, index: number) => {
+									return <Dropdown.Item key={index} onClick={() => { parent.setState({ playbackSpeed: speed }) }}>Speed {speed}</Dropdown.Item>
+								})
+							}
+						</Dropdown.Menu>
+					</Dropdown>
+				</div>
+			</Col>
+			<Col sm={5}>
+				<div className='option'>
+					{/* <ButtonGroup size="sm" accessKey='1'>
+					<Button>Caption</Button>
+					<Button>Dictionary</Button>
+				</ButtonGroup> */}
+					<div role="group" className="btn-group btn-group-sm">
+						<button type="button" className="btn btn-success" disabled={parent.state.typeoption === TypeOption.SUBTITLE} onClick={() => { parent.setTypeOption(TypeOption.SUBTITLE) }}>Caption</button>
+						<button type="button" className="btn btn-success" disabled={parent.state.typeoption === TypeOption.DICTIONARY} onClick={() => { parent.setTypeOption(TypeOption.DICTIONARY) }}>Dictionary</button>
+					</div>
+					{
+						(parent.state.favorite) ?
+							(
+								<ButtonIcon size={30} loading={loadingFavorite} className="favorite active" iconName="HeartFill" onClick={() => {
+									setLoadingFavorite(true)
+									parent.setMyFavorite().finally(() => {
+										setLoadingFavorite(false)
+									})
+								}} title="Remove to favorites"></ButtonIcon>
+							) : (
+								<ButtonIcon size={30} loading={loadingFavorite} className="favorite" iconName="Heart" onClick={() => {
+									setLoadingFavorite(true)
+									parent.setMyFavorite().finally(() => {
+										setLoadingFavorite(false)
+									})
+								}} title="Add to favorites"></ButtonIcon>
+							)
+
+					}
+				</div>
+			</Col>
+
 		</div>
 	)
 }
 function SubTitleActive(props: any) {
-	const { data } = props
+	const { data, setPause, setPlay, playVideo, videoId, dictionaryRef } = props
+	const [show, setShow] = useState(false);
+	const [word, setWord] = useState(String());
+	const [beforePlayVideo, setBeforePlayVideo] = useState(false);
+	const handleShow = (text: string) => {
+		setBeforePlayVideo(playVideo)
+		setShow(true)
+		let wordrepeat = text
+		wordrepeat = wordrepeat.replace(/[!.,?]/g, String())
+		setWord(wordrepeat)
+		setPause()
+	};
+	const handleClose = () => {
+		setShow(false)
+		if (beforePlayVideo)
+			setPlay()
+	};
+	const onHandleSave = () => {
+		graphql.query(CREATE_DICTIONARYVIDEO, {
+			"videoId": videoId,
+			"word": word,
+			"start": parseFloat(data.start),
+			"dur": parseFloat(data.dur)
+		}).then((data: any) => {
+			let result = data?.createDictionaryByVideo
+			if (result && result.success) {
+				handleClose()
+				var dictionary = new DictionaryModel()
+				dictionary.id = result.data.id
+				dictionary.level = result.data.level
+				dictionary.word = result.data.word
+				dictionary.start = result.data.start
+				dictionary.dur = result.data.dur
+				dictionaryRef.current?.create(dictionary)
+			}
+
+		})
+	}
 	return (
-		<div className="hidden-xs">
-			<h3>{data?.text}</h3>
-		</div>
+		<>
+			<div className="subtitle-active hidden-xs">
+				<h4 className='txt-subtitle'>{
+					data?.texts.map((text: string, index: number) => {
+						return <span key={index} onClick={() => handleShow(text)} >{text}</span>
+					})
+				}</h4>
+			</div>
+			<DictionaryDetail show={show} word={word} handleClose={handleClose} onHandleSave={onHandleSave}></DictionaryDetail>
+		</>
 	)
 }
-function SubTitleItem(props: any) {
-	const { data, updateTime, parentRef } = props
-	const elementRef = useRef(null);
-	const current: any = elementRef.current
-	// var itemScrollPosition = 0
-	// if (current) {
-	// 	const scrollPosition = parentRef.current.scrollTop;
-	// 	const itemRect = current.getBoundingClientRect();
-	// 	itemScrollPosition = itemRect.top + scrollPosition;
-	// 	console.log(`List Item top: ${itemRect.top}, Scroll Position: ${itemScrollPosition}`);
-
-	// }
-	const getscrollTop = () => {
-		var itemScrollPosition = 0
-		if (current) {
-			const scrollPosition = parentRef.current.scrollTop;
-			const itemRect = current.getBoundingClientRect();
-			const parentRect = parentRef.current.getBoundingClientRect()
-
-			itemScrollPosition = (itemRect.top - parentRect.top) + scrollPosition;
-
-		}
-		return itemScrollPosition
-	}
-	if (data.active) {
-		let top = getscrollTop()
-		// console.log(`Row Top: ${top}`)
-		parentRef.current.scrollTo(0, (top - parentRef.current.clientHeight / 2))
-	}
-	// const onClick = (data: RowData) => {
-
-	// 	updateTime(data)
-	// }
-	return (
-		<div ref={elementRef} className={`subtitle ${data.active ? 'active' : String()}`} onClick={() => updateTime(data)}>
-			<div className='txt'>
-				<p>{data.text}</p>
-				{/* <p>{getscrollTop()}</p> */}
-				{/* <p>{data.repeat ? 'repeat':'NO'}</p> */}
-				{/* <p>{itemScrollPosition}</p> */}
-			</div>
-			<div className='tools'>
-				<button className='btn'><Icon iconName='Stopwatch'></Icon></button>
-				<button className='btn'><Icon iconName='ArrowRepeat'></Icon></button>
-			</div>
-
-		</div>
-	)
+export enum TypeTestYoutube {
+	NULL,
+	SUBTITLE,
+	DICTIONARY
 }
 interface VideoPlayerProps {
-	videoId: string
-	test: boolean
+	videoId: string | undefined
+	test?: TypeTestYoutube
+	level?: number
+	onReady?: (event: SubtitlesModel) => void;
+}
+enum TypeOption {
+	SUBTITLE,
+	DICTIONARY
 }
 interface VideoPlayerState {
-	subCurrent: RowData | null
-	// videoId: string
-	rowData: RowData[]
+	repeat: boolean
 	playVideo: boolean
 	input: string
 	playbackSpeed: number
 	option: any
-	model: Subtitles | null
-
+	mobile: boolean
+	favorite: boolean
+	typeoption: TypeOption
+	model: SubtitlesModel | null
+	indexsub: number
 }
+
 class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 	_onEvent: any = null;
 	playerRef: any
 	subtitleRef: any
+	dictionaryRef: any
 	constructor(props: any) {
 		super(props)
 		this.playerRef = React.createRef();
 		this.subtitleRef = React.createRef();
+		this.dictionaryRef = React.createRef();
 		this.state = {
-			subCurrent: null, rowData: [], playVideo: false, playbackSpeed: 1, input: String(),
+			playVideo: false,
+			playbackSpeed: 1,
+			input: String(),
+			repeat: false,
 			model: null,
+			favorite: false,
+			typeoption: this.props.test == TypeTestYoutube.DICTIONARY ? TypeOption.DICTIONARY : TypeOption.SUBTITLE,
+			indexsub: 0,
+			mobile: false,
 			option: {
 				height: '390',
 				width: '640',
@@ -171,7 +210,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 					controls: 0,
 					rel: 0,
 					showinfo: 1,
-					mute: 1,
+					mute: 0,
 					loop: 0
 				}
 			}
@@ -179,23 +218,60 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 	}
 	componentDidMount() {
 		// this.updateVideo("c0S6_6me9r8")
-		const videoId = this.props.videoId
-		const self = this
-		axios.get(`http://localhost:3002/subtitle/en/${videoId}`)
-			.then(function (response) {
-				self.setState({ rowData: response.data })
-				const model = Subtitles.parse(response.data)
-				self.setState({ model: model })
-				// console.log(response)
-				// self.setState({ videoId: videoId })
-			})
-			.catch(function (error) {
-				// handle error
-				console.log(error);
-			})
+		this.fetch()
 		window.addEventListener('resize', this.handleResize.bind(this))
 		this.handleResize()
 	}
+	async fetch() {
+		const videoId = this.props.videoId
+		const self = this
+		graphql.query(VIDEO_DETAIL, { videoId: videoId }).then(async (data: any) => {
+			const result = data?.video
+			if (result) {
+
+				const model = SubtitlesModel.parse(result.subtitles)
+				// if (self.props.test && model) {
+				// 	model.generateExercise()
+				// }
+
+				if (self.props.onReady && model) {
+					await self.props.onReady(model)
+				} else if (self.props.test && model) {
+					var worknumber = 2
+					if (this.props.level === 2) {
+						worknumber = 0
+					} else if (this.props.level === 3) {
+						worknumber = 2
+					}
+					model.generateExercise(worknumber)
+				}
+				self.setState({ model: model, favorite: result.favorite })
+			}
+
+		}).catch(function (error) {
+			// handle error
+			console.log(error);
+		})
+	}
+
+	async setMyFavorite() {
+		return graphql
+			.query((this.state.favorite ? MUTATION_DELETE_MY_VIDEO : MUTATION_CREATE_MY_VIDEO), { videoId: this.props.videoId })
+			.then((data: any) => {
+				if (this.state.favorite) {
+					if (data?.deleteMyVideo?.success) {
+						this.setState({ favorite: false })
+					}
+					return data?.deleteMyVideo
+				} else {
+					if (data?.createMyVideo?.success) {
+						this.setState({ favorite: true })
+					}
+					return data?.createMyVideo
+				}
+			})
+	}
+
 	handleResize() {
 		const container = document.querySelector(".youtube-container .video")
 		let current: any = this.playerRef.current
@@ -217,34 +293,27 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 			})
 			// console.log(container.clientHeight, container.clientWidth)
 		}
+		var mobile = false
+		if (window.innerWidth <= Variables.WIDTH_MOBILE) {
+			mobile = true
+		}
+		this.setState({ mobile: mobile })
 	}
 	componentWillUnmount() {
 		window.removeEventListener('resize', this.handleResize.bind(this))
 	}
 	nextSub() {
 
-		if (this.state.subCurrent) {
-			let index = this.state.rowData.indexOf(this.state.subCurrent)
-			this.updateTime(this.state.rowData[index + 1])
-		}
+		this.onActive(this.state.indexsub + 1)
 	}
 	backSub() {
-		if (this.state.subCurrent) {
-			let index = this.state.rowData.indexOf(this.state.subCurrent)
-			if (index > 0) {
-				this.updateTime(this.state.rowData[index - 1])
-			}
-
-		}
+		this.onActive(this.state.indexsub - 1)
 	}
 	reloadSub() {
-		if (this.state.subCurrent) {
-			let index = this.state.rowData.indexOf(this.state.subCurrent)
-			if (index > 0) {
-				this.updateTime(this.state.rowData[index])
-			}
-
-		}
+		this.onActive(this.state.indexsub)
+	}
+	setTypeOption(type: TypeOption) {
+		this.setState({ typeoption: type })
 	}
 	play() {
 		let current: any = this.playerRef.current
@@ -258,20 +327,8 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 			current.internalPlayer.pauseVideo();
 		}
 	}
-	setRepeat(data: RowData) {
-		let repeat = data?.repeat
-		// console.log(data)
-		let list: RowData[] = []
-		for (let index = 0; index < this.state.rowData.length; index++) {
-			const item: RowData = this.state.rowData[index];
-			item.repeat = false;
-			list.push(item)
-		}
-		let index = this.state.rowData.indexOf(data)
-		let current = list[index]
-		current.repeat = !repeat
-		this.setState({ rowData: list })
-		this.setState({ subCurrent: current })
+	setRepeat(status: boolean = true) {
+		this.setState({ repeat: status })
 	}
 	onReady(event: any) {
 		// event.target.playVideo();
@@ -282,7 +339,6 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 			titleElement.style.display = 'none';
 		}
 		this.handleStateChange(event)
-		console.log("ready...")
 	}
 	handleStateChange(event: any) {
 		if (this._onEvent) {
@@ -299,11 +355,13 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 			const currentTime = event.target.getCurrentTime();
 			// console.log('Current time:', currentTime);
 			// console.log(this.state.subCurrent)
-			if (this.state?.subCurrent && (this.state?.subCurrent.repeat || this.props.test)) {
+			let model = this.state.model
+			let subCurrent = model?.data[this.state.indexsub]
+			if (subCurrent && ((this.props.test && subCurrent.exercise) || this.state.repeat)) {
 				// let endtime = parseFloat(this.state.subCurrent.start.toString()) + parseFloat(this.state.subCurrent.dur.toString())
-				let index = this.state.rowData.indexOf(this.state.subCurrent)
+				// let index = this.state.rowData.indexOf(this.state.subCurrent)
 				let endtime = 0;
-				let nextitem = this.state.rowData[index + 1]
+				let nextitem = model?.data[this.state.indexsub + 1]
 				if (nextitem) {
 					endtime = nextitem.start
 				}
@@ -313,48 +371,43 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 					// 	current.internalPlayer.pauseVideo()
 					// }
 					// console.log('reload')
-					self.updateTime(this.state?.subCurrent);
+					self.updateTime(subCurrent);
 				}
 			} else {
-				let data = this.state.rowData.find((x: RowData) => parseInt(x.start.toString()) === parseInt(currentTime))
-				if (data) {
-					self.setActiveSub(data);
+				let index = this.state.model?.data.findIndex((x: Subtitle) => parseInt(x.start.toString()) === parseInt(currentTime))
+				if (index && index >= 0) {
+					// self.onActive(data);
+					this.setState({ indexsub: index })
 				}
 			}
 
 			// console.log('Current data:', data);
 		}, 500); // Check every 1 second
 	}
-	updateTime(data: RowData) {
+	updateTime(data: Subtitle) {
 		let current: any = this.playerRef.current
 		if (current) {
 			current.internalPlayer.seekTo(parseInt(data.start.toString()));
-			current.internalPlayer.playVideo();
-			this.setActiveSub(data);
+			// current.internalPlayer.playVideo();
+			// this.setActiveSub(data);
 		}
 	};
-	setActiveSub(data: RowData) {
-		let list: RowData[] = []
-		for (let index = 0; index < this.state.rowData.length; index++) {
-			const item: RowData = this.state.rowData[index];
-			item.active = false;
-			list.push(item)
+	onActive(index: number) {
+		let data = this.state.model?.data[index]
+		if (data) {
+			this.updateTime(data)
 		}
-		let index = this.state.rowData.indexOf(data)
-		list[index].active = true
-		this.setState({ rowData: list })
-		this.setState({ subCurrent: data })
-	};
-
+		this.setState({ indexsub: index })
+	}
 	render(): React.ReactNode {
 		let current: any = this.playerRef.current
 		if (current) {
 			current.internalPlayer.setPlaybackRate(this.state?.playbackSpeed);
 		}
+		let subCurrent = this.state.model?.data[this.state.indexsub]
 		return (
-
 			<>
-				<Container>
+				<Container className='video-player'>
 					<Row>
 						<Col md={7}>
 							<div className="youtube-container">
@@ -372,23 +425,55 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 								<VideoPlayerTools parent={this} />
 							</div>
 							{
-								!this.props.test && (<SubTitleActive data={this.state?.subCurrent} />)
+								!this.props.test && (<SubTitleActive dictionaryRef={this.dictionaryRef} data={subCurrent} setPause={this.pause.bind(this)} setPlay={this.play.bind(this)} playVideo={this.state.playVideo} videoId={this.props.videoId} />)
 							}
 
 						</Col>
 						<Col md={5}>
-							<div className='subtitles' ref={this.subtitleRef}>
-								{
-									this.state?.rowData.map((item: RowData, index: number) => {
-										return <SubTitleItem data={item} key={index} updateTime={this.updateTime.bind(this)} parentRef={this.subtitleRef} />
-									})
-								}
-							</div>
-						</Col>
-						{
-							this.props.test && (<Test level={2} data={this.state.subCurrent} subtitles={this.state.model} next={this.nextSub.bind(this)} />)
-						}
+							{
+								!this.state.mobile && (
+									<div className='box-subtitle-dictionary'>
+										{
+											this.state.typeoption === TypeOption.SUBTITLE ?
+												(
+													<Subtitles videoId={this.props.videoId} level={this.props.level} data={this.state.model?.data} indexsub={this.state.indexsub} test={this.props.test} onActive={this.onActive.bind(this)}></Subtitles>
 
+												) :
+												(
+													<Dictionary ref={this.dictionaryRef} level={this.props.level || 1} videoId={this.props.videoId} model={this.state.model} test={this.props.test}></Dictionary>
+												)
+										}
+									</div>
+								)
+							}
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							{
+								this.props.test && (<Test level={this.props.level} data={subCurrent} subtitles={this.state.model} next={this.nextSub.bind(this)} />)
+							}
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							{this.state.mobile && (
+
+								<div className='box-subtitle-dictionary'>
+									{
+										this.state.typeoption === TypeOption.SUBTITLE ?
+											(
+												<Subtitles videoId={this.props.videoId} data={this.state.model?.data} indexsub={this.state.indexsub} test={this.props.test} onActive={this.onActive.bind(this)}></Subtitles>
+
+											) :
+											(
+												<Dictionary ref={this.dictionaryRef} level={this.props.level || 1} videoId={this.props.videoId} model={this.state.model} test={this.props.test}></Dictionary>
+											)
+									}
+								</div>
+
+							)}
+						</Col>
 					</Row>
 				</Container>
 			</>
@@ -396,12 +481,8 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 	}
 }
 
-function Youtube(props: any) {
-	return (
-		<>
-			<VideoPlayer {...props}></VideoPlayer>
-		</>
-	);
-}
+// function Youtube(props: any) {
+// 	return (<VideoPlayer {...props}></VideoPlayer>);
+// }
 
-export default Youtube;
+export default VideoPlayer;

@@ -1,0 +1,107 @@
+@import "../../../style/base/common";
+
+.dictionary-exercise {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	max-width: 500px;
+	margin: 0 auto;
+
+	.question {
+		@include t-title-01;
+		text-align: center;
+		margin: 30px 0;
+	}
+
+	.answer-vs-options,
+	.answer-vs-input-answer {
+		height: 320px;
+
+		.input-answer {
+			display: flex;
+			gap: 2px;
+			justify-content: center;
+
+			input {
+				min-width: 100px;
+				border-radius: 5px;
+				text-align: center;
+				font-weight: bold;
+				padding: 5px;
+			}
+		}
+
+		.options {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+
+			button {
+				&.active {
+					border: 1px solid transparent;
+					@include active_background;
+				}
+
+				&.error {
+					border: 1px solid transparent;
+					@include error_background;
+				}
+			}
+		}
+
+		.answer {
+			&.error {
+				border-radius: var(--radius);
+				padding: 10px;
+				box-shadow: rgb(255 0 0 / 90%) 0px 2px 8px 0px;
+				border: 1px solid rgb(255 0 0 / 90%);
+			}
+
+			.meanings {
+				height: 225px;
+				overflow: auto;
+				margin: 0 -10px;
+
+				.list {
+					padding: 0 10px;
+
+					.definitions {
+						border-radius: var(--radius);
+						box-shadow: var(--card-shadow);
+						margin: 10px 0;
+						padding: 10px;
+					}
+				}
+
+			}
+		}
+	}
+
+
+	.tools {
+		margin-top: 20px;
+		gap: 5px;
+		display: flex;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: 0 auto;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0px 5px 16px rgba(0, 0, 0, 0.20);
+    -webkit-backdrop-filter: blur(15);
+    backdrop-filter: blur(15);
+
+		.container {
+			gap: 5px;
+			display: flex;
+			padding-top: 20px;
+			padding-bottom: 20px;
+			max-width: 500px;
+			button {
+				width: 100%;
+			}
+		}
+
+	}
+}
