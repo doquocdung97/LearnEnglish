@@ -2,6 +2,9 @@ import { useRef } from "react"
 import { Subtitle, WordQuestion } from "../utils"
 import { Icon } from "../../icon";
 import './style.scss';
+import { Link } from "react-router-dom";
+import { config } from "process";
+import { Config } from "../../../constants";
 
 function SubTitleItem(props: any) {
     const { data, onActive, parentRef, active, index, test } = props
@@ -60,11 +63,17 @@ function SubTitleItem(props: any) {
     )
 }
 export function Subtitles(props: any) {
-    const { data, test, indexsub, onActive } = props
+    const { data, test, indexsub, onActive, videoId, level } = props
     const subtitleRef = useRef(null)
     return (
         <>
-
+            <div className="go-to-test">
+                {
+                    Config.TEST_SUBTITLE?.map((item: any, index: number) => {
+                        return (<a key={index} href={`/video/test/${videoId}/${item}`} className={item === level && test === 1 ? "disabled" : String()} ><span>Test {item}</span></a>)
+                    })
+                }
+            </div>
             <div className='subtitles' >
                 <div className="tools">
 

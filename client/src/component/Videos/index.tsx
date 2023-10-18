@@ -5,12 +5,12 @@ import { Icon } from '../icon';
 export function Videos(props: any) {
 	const { data, isLoading } = props
 	const data_example = [1,2,3,4,5,6].map(e=>{return {id:e}})
-	const rowdatas = isLoading ? data_example : data?.data
+	const rowdatas = isLoading ? data_example : data
 	return (
 		<>
 			<Row className="list-video">
 				{
-					rowdatas.map((item: any, index: number) => {
+					rowdatas?.map((item: any, index: number) => {
 						return (
 							<Col xs={6} md={4} key={index}>
 								{

@@ -16,3 +16,11 @@ export function ButtonLogin(props: any) {
     }
     return (<button {...props}>{props.children}</button>)
 }
+export function ButtonText(props: any) {
+    const { loading } = props
+    if(loading){
+        return (
+        <button {...props} className={`btn btn-text ${props.className} button__loader`} disabled={true} type="button"><span>Loading...</span></button>)
+    }
+    return (<button {...props} className={`btn btn-text ${props.className}`}>{props.children}</button>)
+}

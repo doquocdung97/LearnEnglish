@@ -153,9 +153,14 @@ function SubTitleActive(props: any) {
 		</>
 	)
 }
+export enum TypeTestYoutube {
+	NULL,
+	SUBTITLE,
+	DICTIONARY
+}
 interface VideoPlayerProps {
 	videoId: string | undefined
-	test?: boolean
+	test?: TypeTestYoutube
 	level?: number
 	onReady?: (event: SubtitlesModel) => void;
 }
@@ -193,7 +198,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 			repeat: false,
 			model: null,
 			favorite: false,
-			typeoption: TypeOption.SUBTITLE,
+			typeoption: this.props.test == TypeTestYoutube.DICTIONARY ? TypeOption.DICTIONARY : TypeOption.SUBTITLE,
 			indexsub: 0,
 			mobile: false,
 			option: {
@@ -431,11 +436,11 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 										{
 											this.state.typeoption === TypeOption.SUBTITLE ?
 												(
-													<Subtitles data={this.state.model?.data} indexsub={this.state.indexsub} test={this.props.test} onActive={this.onActive.bind(this)}></Subtitles>
+													<Subtitles videoId={this.props.videoId} level={this.props.level} data={this.state.model?.data} indexsub={this.state.indexsub} test={this.props.test} onActive={this.onActive.bind(this)}></Subtitles>
 
 												) :
 												(
-													<Dictionary ref={this.dictionaryRef} videoId={this.props.videoId} model={this.state.model}></Dictionary>
+													<Dictionary ref={this.dictionaryRef} level={this.props.level || 1} videoId={this.props.videoId} model={this.state.model} test={this.props.test}></Dictionary>
 												)
 										}
 									</div>
@@ -458,11 +463,11 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState>{
 									{
 										this.state.typeoption === TypeOption.SUBTITLE ?
 											(
-												<Subtitles data={this.state.model?.data} indexsub={this.state.indexsub} test={this.props.test} onActive={this.onActive.bind(this)}></Subtitles>
+												<Subtitles videoId={this.props.videoId} data={this.state.model?.data} indexsub={this.state.indexsub} test={this.props.test} onActive={this.onActive.bind(this)}></Subtitles>
 
 											) :
 											(
-												<Dictionary ref={this.dictionaryRef} videoId={this.props.videoId} model={this.state.model}></Dictionary>
+												<Dictionary ref={this.dictionaryRef} level={this.props.level || 1} videoId={this.props.videoId} model={this.state.model} test={this.props.test}></Dictionary>
 											)
 									}
 								</div>

@@ -23,10 +23,11 @@ export default class YoutubeAPIHelper {
 		this._service = google.youtube('v3');
 	}
 	async fetch_data(url: string, params: any = {}) {
-		url = `${this._setting.ENDPOINT}${url}`
+		const self = this
+		url = `${self._setting.ENDPOINT}${url}`
 		return axios.get(url, {
 			params: {
-				key: this._setting.KEY,
+				key: self._setting.KEY,
 				...params
 			}
 		})
@@ -35,32 +36,13 @@ export default class YoutubeAPIHelper {
 				return response.data
 			})
 			.catch(function (error) {
-				this._logger.error(`url: ${url}\nerror: ${error}`)
+				self._logger.error(`url: ${url}\nerror: ${error}`)
 			})
 	}
 	async listVideo(data: any) {
 		var fucn = this._service.search
 		if (data.playlistId) {
 			fucn = this._service.playlistItems
-			const playlist = await this._service.playlists.list({
-				auth: this._setting.KEY,
-				part: 'id,snippet',
-				id: data.playlistId
-			}).then(result => {
-				if (result.data.items.length > 0) {
-					return result.data.items[0].snippet
-				}
-				return {}
-			})
-			const result = await fucn.list({
-				auth: this._setting.KEY,
-				part: 'id,snippet',
-				...data
-			})
-				.then(response => {
-					return response.data
-				})
-			return Object.assign(playlist,result)
 		}
 		return fucn.list({
 			auth: this._setting.KEY,
@@ -70,6 +52,15 @@ export default class YoutubeAPIHelper {
 			.then(response => {
 				return response.data
 			})
+	}
+	async playlists(playlistIds: string[]) {
+		return await this._service.playlists.list({
+			auth: this._setting.KEY,
+			part: 'id,snippet',
+			id: playlistIds.toString()
+		}).then(result => {
+			return result.data
+		})
 	}
 	detail(videoId: string) {
 

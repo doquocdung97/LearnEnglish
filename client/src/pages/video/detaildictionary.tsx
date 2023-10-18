@@ -7,14 +7,20 @@ import { Levels } from "../../component/dictionary/Test";
 import { NotifyContext } from "../../component/Notify";
 
 const graphql = new GraphqlHelper()
-function DetailDictionary(props:any){
+function DetailDictionary(props: any) {
 	const { id, level } = useParams();
-    const levelnew = level ? parseInt(level) : 0
+	const levelnew = level ? parseInt(level) : 1
 	var TextLevel = Levels[0]
-	if (Levels[levelnew]) {
-		TextLevel = Levels[levelnew]
+	if (Levels[levelnew-1]) {
+		TextLevel = Levels[levelnew-1]
 	}
-	const value  = React.useContext(NotifyContext)
-	return (<TextLevel {...props} id={id}></TextLevel>)
+	const value = React.useContext(NotifyContext)
+	return (
+		<>
+			<div className="container">
+				<TextLevel {...props} id={id}></TextLevel>
+			</div>
+		</>
+	)
 }
 export default DetailDictionary

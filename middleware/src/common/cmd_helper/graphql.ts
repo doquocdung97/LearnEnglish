@@ -211,4 +211,17 @@ query videos($id:ID){
   }
 }
   `
+  static readonly PLAYLIST = gql`
+  {
+    playLists{
+      data{
+        id
+        attributes{
+          Title
+          playListId
+        }
+      }
+    }
+  }
+  `
 }

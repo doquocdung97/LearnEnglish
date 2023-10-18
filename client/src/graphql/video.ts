@@ -38,6 +38,80 @@ query videos {
 }
 `;
 
+export const PLAYLISTS_VIDEOS = gql`
+query PlayLists($pagination: PaginationTokenInput) {
+  playLists {
+    id
+    title
+    video(pagination: $pagination) {
+      data {
+        id
+        title
+        publishedAt
+        thumbnails {
+          url
+          height
+          width
+        }
+      }
+      pagination {
+        prevPageToken
+        total
+        nextPageToken
+      }
+    }
+  }
+}
+`;
+
+export const PLAYLIST_VIDEOS = gql`
+query playList($playlistId: String!, $pagination: PaginationTokenInput) {
+  playList(playlistId: $playlistId) {
+    id
+    title
+    video(pagination: $pagination) {
+      data {
+        id
+        title
+        publishedAt
+        thumbnails {
+          url
+          height
+          width
+        }
+      }
+      pagination {
+        prevPageToken
+        total
+        nextPageToken
+      }
+    } 
+  }
+}
+`;
+
+export const SEARCH_VIDEOS = gql`
+query Search($text: String!, $pagination: PaginationTokenInput) {
+  search(text: $text, pagination: $pagination) {
+    data {
+      id
+      title
+      publishedAt
+      thumbnails {
+        url
+        height
+        width
+      }
+    }
+    pagination {
+      total
+      prevPageToken
+      nextPageToken
+    }
+  }
+}
+`;
+
 export const VIDEO_DETAIL = gql`
 query video($videoId: String!) {
   video(id: $videoId) {

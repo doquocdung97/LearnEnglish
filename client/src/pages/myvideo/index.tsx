@@ -16,7 +16,7 @@ export default function MyVideo(props: any) {
 		<>
 		<div className='my-video'>
 			<div className='container'>
-			<Videos data={data} isLoading={isLoading}></Videos>
+			<Videos data={data?.data} isLoading={isLoading}></Videos>
 			</div>
 		</div>
 		</>

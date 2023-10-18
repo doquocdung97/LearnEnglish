@@ -15,6 +15,8 @@ import {
 } from 'graphql';
 import { User } from '../user/schema';
 import VideoRepository from '../../repository/Video';
+import { PaginationTokenInputSchema, createResultPaginationToken } from '../common';
+import { PaginationInput } from '../../model/common';
 
 const SubtitleSchema = new GraphQLObjectType({
 	name: 'Subtitle',
@@ -81,6 +83,33 @@ export const VideoSchema = new GraphQLObjectType({
 		},
 		user: {
 			type: User
+		}
+	},
+});
+export const PaginationTokenVideosResult = createResultPaginationToken('Videos', VideoSchema)
+export const PlayListSchema = new GraphQLObjectType({
+	name: 'PlayList',
+	fields: {
+		id: {
+			type: GraphQLString,
+		},
+		title: {
+			type: GraphQLString,
+		},
+		thumbnails: {
+			type: new GraphQLList(ThumbnailSchema),
+		},
+		video: {
+			type: PaginationTokenVideosResult,
+			args:{
+				pagination:{
+					type:PaginationTokenInputSchema
+				}
+			},
+			resolve: async (source: any, args: any, context: any, info: any) => {
+				const pagination = PaginationInput.parse(args.pagination)
+				return await videorepo.videoByPlayList(source.id, pagination)
+			},
 		}
 	},
 });

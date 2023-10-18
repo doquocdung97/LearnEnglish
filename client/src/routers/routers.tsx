@@ -9,14 +9,16 @@ import MyVideo from '../pages/myvideo';
 import DetailDictionary from '../pages/video/detaildictionary';
 import LoginPage from '../pages/login';
 import Account from '../layout/Account';
-import { Topic } from '../pages/topic';
+import Topic from '../pages/topic';
+import SearchPage from '../pages/search';
 
 const Routes = [
 	{
 		element: (<MainLayout />),
 		children: [
 			{ path: "/", element: <Home /> },
-			{ path: "/topic", element: <Topic /> },
+			{ path: "/search", element: <SearchPage /> },
+			{ path: "/topic/:id", element: <Topic /> },
 			{ path: "/myvideo", element: <MyVideo /> },
 			{ path: "/videos", element: <Videos /> },
 			{ path: "/video/:id", element: <DetailVideo /> },

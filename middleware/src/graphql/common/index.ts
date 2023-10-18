@@ -71,7 +71,7 @@ export function createResultPagination(name: string, model: GraphQLObjectType): 
 		}
 	})
 }
-export function createResultPaginationToken(name: string, model: GraphQLObjectType): GraphQLObjectType {
+export function createResultPaginationToken(name: string, model: GraphQLObjectType,fields:any = {}): GraphQLObjectType {
 	return new GraphQLObjectType({
 		name: `PaginationToken${name}Result`,
 		fields: {
@@ -80,7 +80,8 @@ export function createResultPaginationToken(name: string, model: GraphQLObjectTy
 			},
 			data: {
 				type: new GraphQLList(model)
-			}
+			},
+			...fields
 		}
 	})
 }
@@ -130,7 +131,7 @@ export const PaginationTokenInputSchema = new GraphQLInputObjectType({
 	name: `PaginationTokenInput`,
 	fields: {
 		pageSize: {
-			type: new GraphQLNonNull(GraphQLInt)
+			type: GraphQLInt
 		},
 		pageToken: {
 			type: GraphQLString

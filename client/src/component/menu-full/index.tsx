@@ -47,9 +47,9 @@ function MenuFull(props: any) {
 											<li>
 												<Link to="/" onClick={onHide}>Home</Link>
 											</li>
-											<li>
+											{/* <li>
 												<Link to="/topic" onClick={onHide}>Topic</Link>
-											</li>
+											</li> */}
 											{
 												(!isLoading && !data) && (
 													<li>

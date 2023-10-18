@@ -24,7 +24,7 @@ export default class GraphqlHelper {
 			const q = await client.request(query, variables).then()
 			return q
 		} catch (error) {
-			// this._logger.error(`error ${error}\n query: ${query}\n variables: ${variables}`)
+			console.error(`error ${error}\n query: ${query}\n variables: ${variables}`)
 		}
 	}
 }

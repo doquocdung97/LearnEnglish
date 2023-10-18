@@ -13,14 +13,19 @@ import {
 	getNamedType,
 	GraphQLResolveInfo
 } from 'graphql';
-import { VideoSchema } from './schema';
+import { VideoSchema ,PaginationTokenVideosResult, PlayListSchema} from './schema';
 import { PaginationInputSchema, PaginationTokenInputSchema, ResultBase, createResultPagination, createResultPaginationToken } from '../common';
 import VideoRepository from '../../repository/Video';
 import { PaginationInput } from '../../model/common';
 
 // Create the GraphQL schema
 const videorepo = new VideoRepository()
-const PaginationVideosResult = createResultPaginationToken('Videos', VideoSchema)
+const PaginationTokenVideosPlayListResult = createResultPaginationToken('VideosPlayList', VideoSchema,{
+	title:{
+		type:GraphQLString
+	}
+})
+const PaginationVideosResult = createResultPagination('Videos', VideoSchema)
 const schema = new GraphQLSchema({
 	query: new GraphQLObjectType({
 		name: 'Query',
@@ -73,7 +78,7 @@ const schema = new GraphQLSchema({
 				},
 			},
 			search:{
-				type: PaginationVideosResult,
+				type: PaginationTokenVideosResult,
 				args:{
 					text:{
 						type:new GraphQLNonNull(GraphQLString)
@@ -93,7 +98,7 @@ const schema = new GraphQLSchema({
 				},
 			},
 			youtubeByChannel:{
-				type: PaginationVideosResult,
+				type: PaginationTokenVideosResult,
 				args:{
 					channelId:{
 						type:new GraphQLNonNull(GraphQLString)
@@ -112,20 +117,38 @@ const schema = new GraphQLSchema({
 					return null
 				},
 			},
-			youtubeByPlayList:{
-				type: PaginationVideosResult,
+			playList:{
+				type: PlayListSchema,
 				args:{
 					playlistId:{
 						type:new GraphQLNonNull(GraphQLString)
-					},
-					pagination:{
-						type:PaginationTokenInputSchema
 					}
 				},
 				resolve: async (source: any, args: any, context: any, info: any) => {
 					try {
-						const pagination = PaginationInput.parse(args.pagination)
-						return await videorepo.videoByPlayList(args.playlistId,pagination)
+						// const pagination = PaginationInput.parse(args.pagination)
+						return await videorepo.playList(args.playlistId)
+					} catch (error) {
+						console.error(error)
+					}
+					return null
+				},
+			},
+			playLists:{
+				// type: PaginationTokenVideosPlayListResult,
+				type: new GraphQLList(PlayListSchema),
+				// args:{
+				// 	playlistId:{
+				// 		type:new GraphQLNonNull(GraphQLString)
+				// 	},
+				// 	pagination:{
+				// 		type:PaginationTokenInputSchema
+				// 	}
+				// },
+				resolve: async (source: any, args: any, context: any, info: any) => {
+					try {
+						// const pagination = PaginationInput.parse(args.pagination)
+						return await videorepo.playList()
 					} catch (error) {
 						console.error(error)
 					}

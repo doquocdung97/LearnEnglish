@@ -1,16 +1,20 @@
 import { useQuery } from 'react-query'
 import GraphqlHelper from '../../graphql';
-import { GLOBAL_VIDEOS } from "../../graphql/video";
+import { PLAYLISTS_VIDEOS } from "../../graphql/video";
 import './style.scss'
-import { Videos } from "../../component/Videos";
 import NoData from "../../component/no-data";
-import { Button } from 'react-bootstrap';
+import {PlayLists} from '../../component/PlayList';
+import { Config, Variables } from '../../constants';
 const graphql = new GraphqlHelper()
 const Home = (props: any) => {
-	const { data, isLoading } = useQuery(['video-main'], () => graphql.query(GLOBAL_VIDEOS).then((data: any) => {
-		return data?.videos
+	const { data, isLoading } = useQuery(['play-list-video'], () => graphql.query(PLAYLISTS_VIDEOS,{
+		"pagination": {
+			"pageSize": Config.PAGINATION_SIZE
+		}
+	}).then((data: any) => {
+		return data?.playLists
 	}))
-	if ((!data || data.length == 0) && !isLoading) {
+	if ((!data || data.length === 0) && !isLoading) {
 		return (
 			<>
 				<NoData></NoData>
@@ -20,13 +24,7 @@ const Home = (props: any) => {
 	return (
 		<div className='home'>
 			<div className='container'>
-				<div className='channel'>
-					<label className='txt-title'>DO QUOC DUNG</label>
-					<Videos data={data} isLoading={isLoading}></Videos>
-					<div className='box-btn'>
-						<Button variant="primary">Load more</Button>
-					</div>
-				</div>
+				<PlayLists data={data} isLoading={isLoading} />
 			</div>
 		</div>
 	)

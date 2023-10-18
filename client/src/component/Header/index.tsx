@@ -9,9 +9,11 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useState } from "react";
 import MenuFull from "../menu-full";
 import { InputSearch } from "../input";
+import { useNavigate } from "react-router-dom";
 
 const graphql_helpper = new GraphqlHelper()
 function Header(props: any) {
+	const navigate = useNavigate();
 	// const { data, isLoading } = useQuery(['user'], () => graphql_helpper.query(QUERY_USER).then((data: any) => { return data?.user }))
 	const [show, setShow] = useState(false);
 
@@ -26,7 +28,9 @@ function Header(props: any) {
 						<img src="/assets/logo.png"></img>
 					</a>
 					<div className="search-header">
-						<InputSearch />
+						<InputSearch onSubmit={(value:string)=>{
+							navigate(`/search?q=${value}`);
+						}}/>
 					</div>
 					<ButtonIcon className="btn-menu" size={50} iconName="List" onClick={handleShow}></ButtonIcon>
 					{/* {

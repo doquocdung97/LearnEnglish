@@ -8,6 +8,7 @@ import { ButtonIcon } from "../Button";
 import { Link } from "react-router-dom";
 import { DictionaryModel } from "./utils";
 import DictionaryDetail from "./detail";
+import { Config } from "../../constants";
 
 class Pagination {
     pageSize: number = 0
@@ -24,13 +25,15 @@ interface DictionaryState {
 interface DictionaryProps {
     model: SubtitlesModel | null
     videoId: string | undefined
+    level: number
+    test: number | undefined
 }
 const graphql = new GraphqlHelper()
 
 
 function DictionaryItem(props: any) {
     const [isLoadingDelete, setIsLoadingDelete] = useState(false)
-    const { data, onDelete,onDetail } = props
+    const { data, onDelete, onDetail } = props
     const onHandleDelete = async (data: DictionaryModel) => {
         setIsLoadingDelete(true)
         let status = await onDelete(data)
@@ -46,7 +49,7 @@ function DictionaryItem(props: any) {
             </div>
 
             <div className='tools'>
-                <button className='btn-icon-sm' onClick={()=>{onDetail(data.word)}}><Icon iconName='InfoLg'></Icon></button>
+                <button className='btn-icon-sm' onClick={() => { onDetail(data.word) }}><Icon iconName='InfoLg'></Icon></button>
                 <ButtonIcon onClick={() => onHandleDelete(data)} loading={isLoadingDelete} iconName='XLg'></ButtonIcon>
             </div>
         </div>
@@ -139,19 +142,28 @@ export class Dictionary extends React.Component<DictionaryProps, DictionaryState
     }
     render() {
         return (
-            <div className="dictionarys">
-                {/* <div className="tools">
-                    <Link to={`/video/dictionary/${this.props.videoId}`}>go test</Link>
-                </div> */}
-                <div ref={this.elemRef} className="list">
+            <>
+                <div className="go-to-test">
                     {
-                        this.state?.rowDatas?.map((item: any) => {
-                            return (<DictionaryItem data={item} onDelete={this.onDelete.bind(this)} onDetail={this.onDetail.bind(this)} />)
+                        Config.TEST_SUBTITLE?.map((item: any, index: number) => {
+                            return (<a key={index} href={`/video/dictionary/${this.props.videoId}/${item}`} className={item === 3 && this.props.test == 2 ? "disabled" : String()} ><span>Test {item}</span></a>)
                         })
                     }
                 </div>
-                <DictionaryDetail show={this.state.show} word={this.state.word} handleClose={this.handleClose.bind(this)}></DictionaryDetail>
-            </div>
+                <div className="dictionarys">
+                    {/* <div className="tools">
+                    <Link to={`/video/dictionary/${this.props.videoId}`}>go test</Link>
+                </div> */}
+                    <div ref={this.elemRef} className="list">
+                        {
+                            this.state?.rowDatas?.map((item: any) => {
+                                return (<DictionaryItem data={item} onDelete={this.onDelete.bind(this)} onDetail={this.onDetail.bind(this)} />)
+                            })
+                        }
+                    </div>
+                    <DictionaryDetail show={this.state.show} word={this.state.word} handleClose={this.handleClose.bind(this)}></DictionaryDetail>
+                </div>
+            </>
         )
     }
 }

@@ -1,9 +1,9 @@
 import { CMSHelper } from "../common/cmd_helper";
-import { GRAPHQL_USER } from "../common/cmd_helper/graphql";
+import { GRAPHQL_USER, GRAPHQL_VIDEO } from "../common/cmd_helper/graphql";
 import { LoggerHelper } from "../common/loggerhelper";
 import YoutubeAPIHelper from "../common/youtube_api_helper";
 import { UserModel, UserTokenModel } from "../model/User";
-import { SubtitleModel, Thumbnail, VideoModel } from "../model/Video";
+import { PlayListModel, SubtitleModel, Thumbnail, VideoModel } from "../model/Video";
 // import { getSubtitles } from "youtube-captions-scraper"
 import { getSubtitles } from 'youtube-caption-extractor';
 import { Pagination, PaginationInput, PaginationModel } from "../model/common";
@@ -250,5 +250,22 @@ export default class VideoRepository {
 			model.pagination.prevPageToken = result.prevPageToken
 		}
 		return model
+	}
+	async playList(): Promise<PlayListModel[]  | null>
+	async playList(id:string): Promise<PlayListModel | null>
+	async playList(id:string = null): Promise<PlayListModel | PlayListModel[] |null> {
+		if(id){
+			const playlists = await this._youtubeHelper.playlists([id])
+			if(playlists.items && playlists.items.length){
+				return new PlayListModel(playlists.items[0])
+			}
+		}
+		const query: any = await this._cmsHelper.query(GRAPHQL_VIDEO.PLAYLIST)
+		const result = query?.playLists
+		if (result && result.data) {
+			const playlists = await this._youtubeHelper.playlists(result.data.map(item => item.attributes.playListId))
+			return playlists.items?.map(n=>new PlayListModel(n))
+		}
+		return null
 	}
 }
