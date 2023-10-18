@@ -3,6 +3,7 @@ import { GRAPHQL_USER } from "../common/cmd_helper/graphql";
 import DictionaryAPIHelper from "../common/dictionary_api_helper";
 import TranslateAPIHelper from "../common/google_api_helper/translate";
 import { LoggerHelper } from "../common/loggerhelper";
+import { randomSort } from "../common/utils";
 import { DictionaryModel, MyDictionaryModel } from "../model/Dictionary";
 import { UserModel, UserTokenModel } from "../model/User";
 import { PaginationInput, PaginationModel } from "../model/common";
@@ -39,17 +40,49 @@ export default class DictionaryRepository {
 		const query: any = await this._cmsHelper.query(GRAPHQL_USER.DICTIONARYVIDEOS, {
 			userId,
 			VideoId,
-			pagination:pagination
+			pagination: pagination
 		})
 		const model = new PaginationModel<MyDictionaryModel>()
 		const result = query?.dictionaryVideos
-		if(result && result.data.length > 0){
+		if (result && result.data.length > 0) {
 			const page = result.meta.pagination
 			model.pagination.pageCount = page.pageCount
 			model.pagination.total = page.total
 			model.data = query.dictionaryVideos.data.map(item => new MyDictionaryModel(item))
 		}
 		return model
+	}
+	async leanWordByVideo(userId: number, VideoId: string, random: boolean, size: number, lang: string = "en"): Promise<MyDictionaryModel[]> {
+		var models: MyDictionaryModel[] = []
+		var _page = 1
+		while (true) {
+			const query: any = await this._cmsHelper.query(GRAPHQL_USER.DICTIONARYVIDEOS, {
+				userId,
+				VideoId,
+				pagination: {
+					pageSize: 10000,
+					page: 0
+				}
+			})
+
+			const result = query?.dictionaryVideos
+			const page = result.meta.pagination
+			if (size > result.data.length) {
+				break
+			}
+			if (result && result.data.length > 0) {
+				const data = query.dictionaryVideos.data.map(item => new MyDictionaryModel(item))
+				models.push(...data)
+				if (page.pageCount == _page) {
+					break
+				}
+				_page++
+			}
+		}
+		if (random) {
+			models = randomSort(models)
+		}
+		return models.slice(0, size)
 	}
 	async createWordByVideo(userId: number, videoId: string, start: number, dur: number, word: string, lang: string = "en"): Promise<MyDictionaryModel | null> {
 		try {

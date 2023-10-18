@@ -20,7 +20,7 @@ export function getRandomNumbers(min: number, max: number, number: number) {
     var vals: number[] = []
     while (vals.length < number) {
       let random = Math.floor(Math.random() * (max - min + 1)) + min;
-      if (vals.length == 0 || vals.find(x => x == random) == undefined) {
+      if (vals.length === 0 || vals.find(x => x === random) === undefined) {
         vals.push(random)
       }
       // console.log(random)
@@ -46,5 +46,13 @@ export function getTokenFromStorage() {
   let token = localStorage?.getItem(Variables.TOKEN_KEY)
   if (token)
     return JSON.parse(token);
+}
+export function isEmptyObject(obj:any) {
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key) && obj[key]) {
+      return false;
+    }
+  }
+  return true;
 }
 // export {}

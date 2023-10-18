@@ -1,0 +1,35 @@
+.search-form {
+  position: relative;
+  width: 100%;
+
+  input {
+    font-size: 14pt;
+    border-radius: var(--radius);
+    border: 1px solid #eee;
+    padding: 5px 10px;
+    width: 100%;
+  }
+
+  .btn-search {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+
+    button {
+      border: none;
+      background: transparent;
+      display: flex;
+      width: 35px;
+      border-top-right-radius: var(--radius);
+      border-bottom-right-radius: var(--radius);
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      &:active {
+        background: #eee;
+        // border-color: #eee;
+      }
+    }
+  }
+}

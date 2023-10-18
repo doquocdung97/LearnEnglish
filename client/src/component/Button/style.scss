@@ -1,33 +1,94 @@
-.btn-icon-sm{
-    border: none;
-    background: transparent;
-    display: flex;
-    // padding: 5px;
-    width: 28px;
-    height: 28px;
-    border-radius: 5px;
-    justify-items: center;
-    align-items: center;
-    &:active {
-        background: #eee;
-        // border-color: #eee;
-    }
-    &.loading{
-        background: #eee;
-        svg{
-            animation:spin 2s linear infinite;
-        }
-    }
+.btn-icon-sm {
+	border: none;
+	background: transparent;
+	display: flex;
+	// padding: 5px;
+	// width: 28px;
+	// height: 28px;
+	border-radius: 5px;
+	justify-items: center;
+	align-items: center;
+
+	&:active {
+		background: #eee;
+		// border-color: #eee;
+	}
+
 }
-@-moz-keyframes spin { 
-    100% { -moz-transform: rotate(360deg); } 
+
+.btn-custom,
+.btn-icon-sm {
+	&.loading {
+		background: #eee;
+
+		svg {
+			animation: spin 2s linear infinite;
+		}
+	}
 }
-@-webkit-keyframes spin { 
-    100% { -webkit-transform: rotate(360deg); } 
+
+@-moz-keyframes spin {
+	100% {
+		-moz-transform: rotate(360deg);
+	}
 }
-@keyframes spin { 
-    100% { 
-        -webkit-transform: rotate(360deg); 
-        transform:rotate(360deg); 
-    } 
+
+@-webkit-keyframes spin {
+	100% {
+		-webkit-transform: rotate(360deg);
+	}
+}
+
+@keyframes spin {
+	100% {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
+	}
+}
+
+.button {
+	&__loader {
+		overflow: hidden;
+		cursor: wait !important;
+
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 150%;
+			height: 100%;
+			background: repeating-linear-gradient(60deg, transparent, transparent 0.75rem, rgb(129 129 129 / 34%) 0.75rem, rgb(163 163 163 / 44%) 1.5rem);
+			animation: load 1s infinite linear;
+		}
+
+		span {
+			position: relative;
+		}
+	}
+}
+
+.btn-text {
+	background: #0066ff;
+	position: relative;
+	color: #fff;
+
+	&:disabled {
+		border-color: #b5b5b5 !important;
+	}
+	&:hover{
+		background: #0051a5;
+		color: #fff;
+	}
+}
+
+/* Loading button animation */
+@keyframes load {
+	0% {
+		transform: translateX(0);
+	}
+
+	100% {
+		transform: translateX(-1.75rem);
+	}
 }

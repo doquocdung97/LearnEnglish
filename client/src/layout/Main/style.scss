@@ -1,0 +1,16 @@
+main {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  .content {
+    margin-top: 50px;
+    flex: 1;
+  }
+  @media (max-width: 575px) {
+    .content {
+      margin-top: 15px;
+    }
+  }
+}

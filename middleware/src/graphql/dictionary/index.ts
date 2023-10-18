@@ -22,6 +22,7 @@ import { PaginationInput } from '../../model/common';
 // Create the GraphQL schema
 const dictionaryrepo = new DictionaryRepository()
 const PaginationDictionaryResult = createResultPagination('Dictionary', DictionarySchema)
+const PaginationMyDictionaryResult = createResultPagination('DictionaryByVideo', MyDictionarySchema)
 const schema = new GraphQLSchema({
 	query: new GraphQLObjectType({
 		name: 'Query',
@@ -30,7 +31,7 @@ const schema = new GraphQLSchema({
 				type: PaginationDictionaryResult,
 				args: {
 					word: {
-						type: GraphQLString
+						type: new GraphQLNonNull(GraphQLString)
 					}
 				},
 				resolve: async (source: any, args: any, context: any, info: any) => {
@@ -46,7 +47,7 @@ const schema = new GraphQLSchema({
 				},
 			},
 			dictionaryByVideo: {
-				type: createResultPagination('DictionaryByVideo', MyDictionarySchema),
+				type: PaginationMyDictionaryResult,
 				args: {
 					VideoId: {
 						type: new GraphQLNonNull(GraphQLString)
@@ -59,6 +60,28 @@ const schema = new GraphQLSchema({
 					try {
 						const pagination = PaginationInput.parse(args.pagination)
 						let data = await dictionaryrepo.getWordByVideo(context.user.id, args.VideoId,pagination)
+						return data
+					} catch (error) {
+						console.error(error)
+					}
+				},
+			},
+			LeanDictionaryByVideo: {
+				type: new GraphQLList(MyDictionarySchema),
+				args: {
+					VideoId: {
+						type: new GraphQLNonNull(GraphQLString)
+					},
+					size: {
+						type: GraphQLInt
+					},
+					random: {
+						type: GraphQLBoolean
+					}
+				},
+				resolve: async (source: any, args: any, context: any, info: any) => {
+					try {
+						let data = await dictionaryrepo.leanWordByVideo(context.user.id, args.VideoId,args.random,args.size)
 						return data
 					} catch (error) {
 						console.error(error)

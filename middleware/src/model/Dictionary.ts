@@ -15,17 +15,12 @@ export class DictionaryModel {
 	id: number
 	word: string
 	translate: string
-	phonetics: PhoneticModel[] = []
+	phonetic: PhoneticModel
 	examples: string[]
 	meanings: MeaningModel[] = []
 	constructor(obj: any) {
-		// obj.phonetics?.map(item=>{
-		// 	const phonetic = new PhoneticModel()
-		// 	phonetic.text = item.text
-		// 	phonetic.audio = item.audio
-		// })
 		this.word = obj.word
-		this.phonetics = obj.phonetics
+		this.phonetic = obj.phonetics?.find(n=>n.audio?.search("-us.mp3") >= 0)
 		obj.meanings?.map(item => {
 			const meaning = new MeaningModel()
 			meaning.type = item.partOfSpeech
@@ -37,7 +32,9 @@ export class DictionaryModel {
 					meaning.definitions.push(d)
 				}
 			})
-			this.meanings.push(meaning)
+			if(meaning.definitions.length > 0){
+				this.meanings.push(meaning)
+			}
 		})
 	}
 }

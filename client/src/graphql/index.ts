@@ -1,18 +1,21 @@
 // import { ApolloClient, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 import { GraphQLClient } from "graphql-request";
+import { getAccessTokenFromStorage } from "../helpers";
+import { Config } from "../constants";
 
 export default class GraphqlHelper {
 	_setting: any
 	_client: GraphQLClient
 	constructor() {
 		this._setting = {
-			"ENDPOINT": `http://localhost:3001/v1/graphql`,
+			"ENDPOINT": `${Config.MIDDLEWARE_ENDPOINT}/v1/graphql`,
 		}
 
 		this._client = new GraphQLClient(this._setting.ENDPOINT);
 	}
 	getToken(){
-		return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjkxNTYzNjQ3LCJleHAiOjE2OTQxNTU2NDd9.XVJQzmd38_QLgrSITKcxMSlX0ZhVAWrM0Metxs3D6jQ"
+		const data = getAccessTokenFromStorage()
+		return data?.accessToken
 	}
 	async query(query: any, variables: any = {}) {
 		try {
@@ -21,7 +24,7 @@ export default class GraphqlHelper {
 			const q = await client.request(query, variables).then()
 			return q
 		} catch (error) {
-			// this._logger.error(`error ${error}\n query: ${query}\n variables: ${variables}`)
+			console.error(`error ${error}\n query: ${query}\n variables: ${variables}`)
 		}
 	}
 }

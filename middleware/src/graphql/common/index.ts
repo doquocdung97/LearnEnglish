@@ -5,7 +5,8 @@ import {
 	GraphQLInt,
 	GraphQLList,
 	GraphQLString,
-	GraphQLInputObjectType
+	GraphQLInputObjectType,
+	GraphQLNonNull
 } from "graphql";
 export const BaseObjectType = {
 	id: {
@@ -23,6 +24,10 @@ export const BaseResultCode = new GraphQLEnumType({
 		},
 		B002: {
 			value: 2
+		},
+		B003: {
+			value: 3,
+			description:"No user found."
 		}
 	},
 })
@@ -66,6 +71,20 @@ export function createResultPagination(name: string, model: GraphQLObjectType): 
 		}
 	})
 }
+export function createResultPaginationToken(name: string, model: GraphQLObjectType,fields:any = {}): GraphQLObjectType {
+	return new GraphQLObjectType({
+		name: `PaginationToken${name}Result`,
+		fields: {
+			pagination: {
+				type: PaginationTokenSchema
+			},
+			data: {
+				type: new GraphQLList(model)
+			},
+			...fields
+		}
+	})
+}
 export const PaginationSchema = new GraphQLObjectType({
 	name: `Pagination`,
 	fields: {
@@ -74,6 +93,26 @@ export const PaginationSchema = new GraphQLObjectType({
 		},
 		pageCount: {
 			type: GraphQLInt
+		},
+		nextPageToken: {
+			type: GraphQLString
+		},
+		prevPageToken: {
+			type: GraphQLString
+		},
+	}
+})
+export const PaginationTokenSchema = new GraphQLObjectType({
+	name: `PaginationToken`,
+	fields: {
+		total: {
+			type: GraphQLInt
+		},
+		nextPageToken: {
+			type: GraphQLString
+		},
+		prevPageToken: {
+			type: GraphQLString
 		},
 	}
 })
@@ -84,7 +123,18 @@ export const PaginationInputSchema = new GraphQLInputObjectType({
 			type: GraphQLInt
 		},
 		pageSize: {
+			type: new GraphQLNonNull(GraphQLInt)
+		}
+	}
+})
+export const PaginationTokenInputSchema = new GraphQLInputObjectType({
+	name: `PaginationTokenInput`,
+	fields: {
+		pageSize: {
 			type: GraphQLInt
+		},
+		pageToken: {
+			type: GraphQLString
 		}
 	}
 })

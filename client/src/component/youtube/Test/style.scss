@@ -1,13 +1,20 @@
 @import "../../../style/base/common";
 
-.objective-test{
-	.question{
+.objective-test {
+	border-radius: var(--radius);
+	box-shadow: var(--card-shadow);
+	padding: 10px;
+	margin: 10px 0;
+	.question {
 		display: flex;
 		gap: 5px;
 		margin: 10px 0;
 		align-items: center;
 		flex-wrap: wrap;
-		.hide,.active,.error{
+
+		.hide,
+		.active,
+		.error {
 			width: 100px;
 			border: 1px solid #0008ff;
 			border-radius: 5px;
@@ -15,49 +22,64 @@
 			font-weight: bold;
 			padding: 5px;
 		}
-		
-		input{
+
+		input {
 			width: 100px;
 			border: 1px solid #0008ff;
 			border-radius: 5px;
 			text-align: center;
 			font-weight: bold;
 			padding: 5px;
-			&.error{
+
+			&.error {
 				border: 1px solid $color02;
+				// background: transparent;
+				// color: #000;
 			}
+
 			&:focus-visible {
 				outline: none;
 			}
 		}
-		p{
+
+		p {
 			margin: 0;
 			@include t-title-01;
 			min-height: 20px;
 		}
-		.active{
-			border: 1px solid transparent;
-			min-width: 100px;
-			width: auto;
-			@include active_background;
-		}
-		.error{
-			border: 1px solid transparent;
-			min-width: 100px;
-			width: auto;
-			@include error_background;
+
+		button {
+			&.active {
+				border: 1px solid transparent;
+				min-width: 100px;
+				width: auto;
+				@include active_background;
+			}
+
+			&.error {
+				border: 1px solid transparent;
+				min-width: 100px;
+				width: auto;
+				@include error_background;
+			}
 		}
 	}
-	.answer{
+
+	.answer {
 		margin: 10px 0;
-		.badge{
+		flex-wrap: wrap;
+		.badge {
 			cursor: pointer;
 		}
+		button{
+			white-space: pre;
+		}
 	}
-	.btn-box{
+
+	.btn-box {
 		width: 100%;
 		display: flex;
 		justify-content: flex-end;
 	}
-	
+
 }

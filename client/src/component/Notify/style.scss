@@ -1,0 +1,16 @@
+.notify-modal{
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+  .icon{
+    width: 100px;
+    img{
+      width: 100%;
+    }
+  }
+  .txt-title{
+    padding: 0;
+    margin: 0;
+  }
+}

@@ -3,7 +3,7 @@ import axios from 'axios';
 import {Config} from '../constants';
 import { getTokenFromStorage } from './utils';
 
-const BASE_URL = Config.REACT_APP_GRAPHQL_URL;
+const BASE_URL = Config.MIDDLEWARE_ENDPOINT;
 
 const request = axios.create({
   baseURL: BASE_URL,

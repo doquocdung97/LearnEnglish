@@ -12,7 +12,7 @@ export const TranslateSchema = new GraphQLObjectType({
 		audio: {
 			type: GraphQLString,
 			resolve: async (source: any, args: any, context: any, info: any) => {
-				return `${context.headers.origin}${source.audio}`
+				return `http://${context.headers.host}${source.audio}`
 			}
 		}
 	},
