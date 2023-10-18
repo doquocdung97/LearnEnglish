@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useContext } from "react"
 import './style.scss';
 import Youtube from "../../youtube";
 import { useParams } from 'react-router-dom';
@@ -12,6 +12,8 @@ import { Icon } from "../../icon";
 import { getRandom, getRandomNumber, randomSort } from "../../../common/utils";
 import Translate from "../../Translate";
 import { useHotkeys } from 'react-hotkeys-hook';
+import { NotifyContext } from "../../Notify";
+import { useNavigate } from "react-router-dom";
 
 
 class HandleExersiceDictionary {
@@ -100,6 +102,8 @@ function Level1(props: any) {
 	})
 
 
+	const notifi = useContext(NotifyContext)
+	const navigate = useNavigate();
 	const fetch = async (page: number = 1) => {
 		if (page > 1 && page >= option.pageCount) {
 			return
@@ -110,7 +114,11 @@ function Level1(props: any) {
 			random: true
 		})
 		const result = query?.LeanDictionaryByVideo
-		if (result?.length > 0) {
+		if(result?.length < 10){
+			notifi.show("There need to be 10 words or more to be able to check.",0,()=>{
+				navigate("/")
+			})
+		}else if (result?.length > 0) {
 			// console.log(result?.data)
 			const model = HandleExersiceDictionary.parse(result)
 			setModel(model)
@@ -344,6 +352,8 @@ function Level2(props: any) {
 	const [model, setModel] = useState<HandleExersiceDictionary>()
 	const inputRef = useRef(null);
 	const buttonRef = useRef(null);
+	const notifi = useContext(NotifyContext)
+	const navigate = useNavigate();
 	var option = {
 		pageCount: 10
 	}
@@ -357,7 +367,11 @@ function Level2(props: any) {
 			random: true
 		})
 		const result = query?.LeanDictionaryByVideo
-		if (result?.length > 0) {
+		if(result?.length < 10){
+			notifi.show("There need to be 10 words or more to be able to check.",0,()=>{
+				navigate("/")
+			})
+		}else if (result?.length > 0) {
 			// console.log(result?.data)
 			const model = HandleExersiceDictionary.parse(result)
 			setModel(model)

@@ -4,6 +4,7 @@ import Footer from "../../component/Footer";
 import './style.scss';
 import Notify from "../../component/Notify";
 export default function MainLayout() {
+	
 	return (
 		<main>
 			<Notify>

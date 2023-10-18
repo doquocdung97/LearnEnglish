@@ -52,8 +52,8 @@ export default class DictionaryRepository {
 		}
 		return model
 	}
-	async leanWordByVideo(userId: number, VideoId: string, random:boolean,size: number, lang: string = "en"): Promise<MyDictionaryModel[]> {
-		var models:MyDictionaryModel[] = []
+	async leanWordByVideo(userId: number, VideoId: string, random: boolean, size: number, lang: string = "en"): Promise<MyDictionaryModel[]> {
+		var models: MyDictionaryModel[] = []
 		var _page = 1
 		while (true) {
 			const query: any = await this._cmsHelper.query(GRAPHQL_USER.DICTIONARYVIDEOS, {
@@ -66,8 +66,11 @@ export default class DictionaryRepository {
 			})
 
 			const result = query?.dictionaryVideos
+			const page = result.meta.pagination
+			if (size > result.data.length) {
+				break
+			}
 			if (result && result.data.length > 0) {
-				const page = result.meta.pagination
 				const data = query.dictionaryVideos.data.map(item => new MyDictionaryModel(item))
 				models.push(...data)
 				if (page.pageCount == _page) {
@@ -76,7 +79,7 @@ export default class DictionaryRepository {
 				_page++
 			}
 		}
-		if(random){
+		if (random) {
 			models = randomSort(models)
 		}
 		return models.slice(0, size)
