@@ -39,6 +39,9 @@ export class VideoModel {
 		this.publishedAt = obj.snippet?.publishedAt
 	}
 	static parseByYoutube(obj) {
+		if(Object.keys(obj.snippet?.thumbnails).length == 0){
+			return null
+		}
 		const model = new VideoModel(obj)
 		if (obj.id.kind == Variables.YOUTUBE_KIND_VIDEO) {
 			model.id = obj.id.videoId
