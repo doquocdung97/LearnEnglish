@@ -262,7 +262,7 @@ export default class VideoRepository {
 		}
 		const query: any = await this._cmsHelper.query(GRAPHQL_VIDEO.PLAYLIST)
 		const result = query?.playLists
-		if (result && result.data) {
+		if (result && result.data && result.data.length) {
 			const playlists = await this._youtubeHelper.playlists(result.data.map(item => item.attributes.playListId))
 			return playlists.items?.map(n=>new PlayListModel(n))
 		}
