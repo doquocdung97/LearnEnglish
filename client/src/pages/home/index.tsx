@@ -23,7 +23,7 @@ const Home = (props: any) => {
 	}
 	return (
 		<div className='home'>
-			<div className='container'>
+			<div className='container' style={{ paddingBottom: 50 }}>
 				<PlayLists data={data} isLoading={isLoading} />
 			</div>
 		</div>

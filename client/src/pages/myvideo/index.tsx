@@ -14,11 +14,11 @@ export default function MyVideo(props: any) {
 	}))
 	return (
 		<>
-		<div className='my-video'>
-			<div className='container'>
-			<Videos data={data?.data} isLoading={isLoading}></Videos>
+			<div className='my-video'>
+				<div className='container' style={{ paddingBottom: 50 }}>
+					<Videos data={data?.data} isLoading={isLoading}></Videos>
+				</div>
 			</div>
-		</div>
 		</>
 	)
 }
